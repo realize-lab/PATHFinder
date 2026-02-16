@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="240" viewBox="0 0 1120 240" role="img" aria-label="Prenatal timeline from week 1 to week 28 with 10 visits">
+  <defs>
+    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#004785"/>
+      <stop offset="100%" stop-color="#2f65a7"/>
+    </linearGradient>
+  </defs>
+  <rect width="1120" height="240" fill="#f4f8fc"/>
+  <text x="26" y="34" font-family="Inter, Segoe UI, sans-serif" font-size="18" fill="#111827" font-weight="700">
+    MedGemma Prenatal Plan Timeline (Week 1 -> Week 28)
+  </text>
+  <line x1="40" y1="120" x2="1080" y2="120" stroke="url(#lineGrad)" stroke-width="8" stroke-linecap="round"/>
+
+  <g font-family="Inter, Segoe UI, sans-serif" font-size="12" fill="#374151">
+    <circle cx="80" cy="120" r="10" fill="#004785"/>
+    <text x="56" y="150">W1 V1</text>
+    <text x="42" y="168">Intake + LMP</text>
+
+    <circle cx="180" cy="120" r="10" fill="#004785"/>
+    <text x="156" y="150">W4 V2</text>
+    <text x="135" y="168">Baseline labs</text>
+
+    <circle cx="280" cy="120" r="10" fill="#004785"/>
+    <text x="256" y="150">W8 V3</text>
+    <text x="228" y="168">Ultrasound order</text>
+
+    <circle cx="390" cy="120" r="10" fill="#004785"/>
+    <text x="363" y="150">W12 V4</text>
+    <text x="330" y="168">NT + counseling</text>
+
+    <circle cx="500" cy="120" r="10" fill="#004785"/>
+    <text x="473" y="150">W16 V5</text>
+    <text x="442" y="168">BP + urine</text>
+
+    <circle cx="610" cy="120" r="10" fill="#004785"/>
+    <text x="583" y="150">W20 V6</text>
+    <text x="556" y="168">Anatomy scan</text>
+
+    <circle cx="720" cy="120" r="10" fill="#004785"/>
+    <text x="693" y="150">W22 V7</text>
+    <text x="658" y="168">Tele follow-up</text>
+
+    <circle cx="830" cy="120" r="10" fill="#004785"/>
+    <text x="803" y="150">W24 V8</text>
+    <text x="772" y="168">Glucose screen</text>
+
+    <circle cx="940" cy="120" r="10" fill="#004785"/>
+    <text x="913" y="150">W26 V9</text>
+    <text x="882" y="168">CBC + Tdap</text>
+
+    <circle cx="1040" cy="120" r="10" fill="#004785"/>
+    <text x="1008" y="150">W28 V10</text>
+    <text x="978" y="168">Growth review</text>
+  </g>
+</svg>
