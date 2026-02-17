@@ -3,190 +3,310 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prenatal Plan Demo - MedGemma + Gemini + MedASR</title>
+  <title>PATHFinder + MedGemma</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="page-shell">
+    <header id="topNav" class="card top-nav">
+      <div class="nav-main">
+        <a id="brandHomeBtn" class="nav-brand" href="#">
+          <span class="brand-copy">
+            <span class="brand-title">PATHFinder Agent</span>
+            <span class="brand-subtitle">Tailored Prenatal Care</span>
+          </span>
+        </a>
+        <div class="nav-actions">
+          <button id="themeToggleBtn" class="theme-toggle" type="button" aria-label="Toggle dark and light mode">
+            <span id="themeToggleIcon" class="theme-toggle-icon" aria-hidden="true">☀</span>
+            <span id="themeToggleLabel">Light</span>
+          </button>
+          <div class="nav-logo-cluster" aria-label="Brand logos">
+            <span class="nav-logo-badge">
+              <img class="nav-logo-image" src="logo.png" alt="Project logo" />
+            </span>
+            <span class="nav-logo-badge">
+              <img class="nav-logo-image" src="michigan_logo.png" alt="University of Michigan logo" />
+            </span>
+          </div>
+          <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Open navigation menu" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+      <nav id="primaryNavLinks" class="nav-links" aria-label="Main navigation">
+        <button class="nav-link page-tab-btn active" data-page-target="demoPage" type="button">Demo</button>
+        <button class="nav-link page-tab-btn" data-page-target="aboutPage" type="button">About</button>
+      </nav>
+    </header>
+
     <header class="card hero">
       <div>
         <p class="eyebrow">Interactive End-to-End Demo</p>
-        <h1>Care -> Oversight Cockpit -> Clinician Cockpit v2</h1>
+        <h1>PATHFinder Agent: Planner for Appropriate Tailored Healthcare Finder Agent</h1>
+        <h3>Intuitive, interactive agentic systems for patients, nurses, and clinicians to provide prenatal care</h3>
         <p class="hero-copy">
-          Prenatal plan creation workflow powered by <strong>MedGemma</strong>, with <strong>Gemini</strong>-generated form UI and <strong>MedASR</strong> transcription in the clinician experience.
+          Example single-patient workflow: data collection, shared planning, and
+          care-delivery adjustments based on social needs and access.
         </p>
       </div>
     </header>
 
-    <section class="card step-controls">
-      <button id="prevStepBtn" class="btn btn-secondary" type="button">Previous</button>
-      <div id="stepLabel" class="step-label">Step 1</div>
-      <button id="nextStepBtn" class="btn btn-primary" type="button">Next</button>
-    </section>
+    <section id="demoPage" class="page-panel active">
+      <section class="card step-controls">
+        <button id="prevStepBtn" class="btn btn-secondary" type="button">Previous</button>
+        <div id="stepLabel" class="step-label">Step 1</div>
+        <button id="nextStepBtn" class="btn btn-primary" type="button">Next</button>
+      </section>
 
-    <section id="commentaryBox" class="card commentary">
-      <h2 id="commentaryTitle">Step commentary</h2>
-      <p id="commentaryText"></p>
-      <ul id="commentaryBullets"></ul>
-    </section>
+      <section id="commentaryBox" class="card commentary">
+        <h2 id="commentaryTitle">Step commentary</h2>
+        <p id="commentaryText"></p>
+        <ul id="commentaryBullets"></ul>
+      </section>
 
-    <nav class="card tabs">
-      <button class="tab-btn active" data-tab-target="careTab">Care</button>
-      <button class="tab-btn" data-tab-target="oversightTab">Oversight Cockpit</button>
-      <button class="tab-btn" data-tab-target="clinicianTab">Clinician Cockpit v2</button>
-    </nav>
+      <nav class="card tabs" aria-label="Workflow tabs">
+        <button class="tab-btn active" data-tab-target="careTab">Care</button>
+        <button class="tab-btn" data-tab-target="oversightTab">Oversight Cockpit</button>
+        <button class="tab-btn" data-tab-target="clinicianTab">Clinician Cockpit</button>
+      </nav>
 
-    <main>
-      <section id="careTab" class="tab-panel active">
-        <div class="grid-two">
-          <article id="patientProfileCard" class="card">
-            <div class="card-title-row">
-              <h2>Get Prenatal care</h2>
-              <span class="pill">Main pipeline fields pre-filled</span>
-            </div>
-            <div class="form-grid">
-              <label>
-                Patient First Name
-                <input type="text" id="patientFirstNameField" value="Emma" disabled />
-              </label>
-              <label>
-                Patient Last Name
-                <input type="text" id="patientLastNameField" value="Rodriguez" disabled />
-              </label>
-              <label>
-                Date of Birth
-                <input type="text" id="patientDobField" value="1994-06-17" disabled />
-              </label>
-              <label>
-                Gender
-                <input type="text" id="patientGenderField" value="Female" disabled />
-              </label>
-              <label>
-                Previous health conditions
-                <input type="text" id="prevHealthField" value="Mild chronic hypertension" disabled />
-              </label>
-              <label>
-                Current health problems or symptoms
-                <input type="text" id="currentSymptomsField" value="Intermittent headaches" disabled />
-              </label>
-              <label>
-                Current Medications
-                <input type="text" id="currentMedsField" value="Prenatal vitamin, low-dose aspirin" disabled />
-              </label>
-              <label>
-                Standard Allergies
-                <input type="text" id="standardAllergiesField" value="Penicillin" disabled />
-              </label>
-              <label class="span-2" id="lmpFieldWrap">
-                Last Menstrual Period (LMP) - only required field
-                <input type="date" id="lmpDateInput" />
-              </label>
-              <div class="span-2 form-actions">
-                <button id="confirmLmpBtn" type="button" class="btn btn-primary">Confirm LMP and Continue</button>
+      <main>
+        <section id="careTab" class="tab-panel active">
+          <div class="grid-two">
+            <article id="patientProfileCard" class="card">
+              <div class="card-title-row">
+                <h2>Prenatal Intake Snapshot</h2>
+                <span class="pill">Main pipeline fields pre-filled</span>
               </div>
-            </div>
-          </article>
+              <div class="form-grid">
+                <label>
+                  Patient First Name
+                  <input type="text" id="patientFirstNameField" value="Danielle" disabled />
+                </label>
+                <label>
+                  Patient Last Name
+                  <input type="text" id="patientLastNameField" value="Carter" disabled />
+                </label>
+                <label>
+                  Date of Birth
+                  <input type="text" id="patientDobField" value="1992-11-03" disabled />
+                </label>
+                <label>
+                  Gravida/Para
+                  <input type="text" id="patientObHistoryField" value="G2P1" disabled />
+                </label>
+                <label>
+                  Gender
+                  <input type="text" id="patientGenderField" value="Female" disabled />
+                </label>
+                <label>
+                  Previous health conditions
+                  <input type="text" id="prevHealthField" value="Chronic hypertension (controlled)" disabled />
+                </label>
+                <label>
+                  Current health problems or symptoms
+                  <input type="text" id="currentSymptomsField" value="Mild nausea, occasional headache" disabled />
+                </label>
+                <label>
+                  Current Medications
+                  <input type="text" id="currentMedsField" value="Prenatal vitamin, aspirin 81 mg nightly" disabled />
+                </label>
+                <label>
+                  Standard Allergies
+                  <input type="text" id="standardAllergiesField" value="Penicillin (rash)" disabled />
+                </label>
+                <label>
+                  Baseline social context
+                  <input type="text" id="baselineSocialField" value="Single parent, hourly job, limited transportation" disabled />
+                </label>
+                <label class="span-2" id="lmpFieldWrap">
+                  Last Menstrual Period (LMP) - required to calculate gestation/EDD
+                  <input type="date" id="lmpDateInput" />
+                </label>
+                <div class="span-2 form-actions">
+                  <button id="confirmLmpBtn" type="button" class="btn btn-primary">Confirm LMP and Continue</button>
+                </div>
+              </div>
+            </article>
 
-          <article id="modalityCard" class="card">
-            <div class="card-title-row">
-              <h2>Care Chat + Embedded LLM Form</h2>
-              <span class="pill">MedGemma + Gemini UI</span>
-            </div>
-            <div id="careChatBox" class="messages compact"></div>
-          </article>
-        </div>
-
-        <article id="planReportCard" class="card">
-          <div class="card-title-row">
-            <h2>Prenatal Plan Report (Week 1 -> Week 28)</h2>
-            <span class="pill">MedGemma-generated, 10 visits</span>
+            <article id="modalityCard" class="card">
+              <div class="card-title-row">
+                <h2>Care Chat + Embedded Social Needs Form</h2>
+                <span class="pill">MedGemma + Gemini UI</span>
+              </div>
+              <div id="careChatBox" class="messages compact"></div>
+            </article>
           </div>
-          <div id="planSummary" class="summary"></div>
-          <div class="table-wrap">
-            <table id="visitTable">
-              <thead>
-                <tr>
-                  <th>Visit</th>
-                  <th>Week</th>
-                  <th>Modality</th>
-                  <th>Tests / Actions</th>
-                </tr>
-              </thead>
-              <tbody id="visitTableBody"></tbody>
-            </table>
-          </div>
-          <div class="timeline-wrap">
-            <img id="careTimelineImage" src="timeline.svg" alt="Week 1 to week 28 prenatal timeline with 10 visits" />
-          </div>
-        </article>
-      </section>
 
-      <section id="oversightTab" class="tab-panel">
-        <div class="grid-two">
-          <article id="oversightStatusCard" class="card">
+          <article id="planReportCard" class="card">
             <div class="card-title-row">
-              <h2>Oversight Cockpit</h2>
-              <span class="pill">High-level status only</span>
+              <h2>Tailored Prenatal Plan Report (Week 8 -> Week 39)</h2>
+              <span class="pill">Medical milestones + social adjustments</span>
             </div>
-            <div id="oversightStatuses" class="status-list"></div>
-            <div class="divider"></div>
-            <div class="form-actions">
-              <button id="takeoverBtn" type="button" class="btn btn-primary">Take Over</button>
-              <span id="takeoverState" class="pill">Takeover inactive</span>
+            <div id="planSummary" class="summary"></div>
+            <div class="table-wrap">
+              <table id="visitTable">
+                <thead>
+                  <tr>
+                    <th>Visit</th>
+                    <th>Week</th>
+                    <th>Modality</th>
+                    <th>Tests / Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="visitTableBody"></tbody>
+              </table>
             </div>
-          </article>
-
-          <article class="card">
-            <div class="card-title-row">
-              <h2>Oversight Notes</h2>
-              <span class="pill">No full transcript shown</span>
-            </div>
-            <div id="oversightNotes" class="event-log"></div>
-          </article>
-        </div>
-      </section>
-
-      <section id="clinicianTab" class="tab-panel">
-        <div class="grid-two">
-          <article id="clinicianPlanCard" class="card">
-            <div class="card-title-row">
-              <h2>Clinician Cockpit v2 - Plan Review</h2>
-              <span class="pill">Received from Care</span>
-            </div>
-            <div id="clinicianPlanSummary" class="summary"></div>
             <div class="timeline-wrap">
-              <img id="clinicianTimelineImage" src="timeline.svg" alt="Prenatal timeline shown to clinician" />
+              <img id="careTimelineImage" src="timeline.svg" alt="Tailored prenatal timeline with key milestones" />
             </div>
           </article>
+        </section>
 
-          <article id="agentCard" class="card">
+        <section id="oversightTab" class="tab-panel">
+          <div class="grid-two">
+            <article id="oversightStatusCard" class="card">
+              <div class="card-title-row">
+                <h2>Oversight Cockpit</h2>
+                <span class="pill">High-level status only</span>
+              </div>
+              <div id="oversightStatuses" class="status-list"></div>
+              <div class="divider"></div>
+              <div class="form-actions">
+                <button id="takeoverBtn" type="button" class="btn btn-primary">Take Over</button>
+                <span id="takeoverState" class="pill">Takeover inactive</span>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-title-row">
+                <h2>Oversight Notes</h2>
+                <span class="pill">No full transcript shown</span>
+              </div>
+              <div id="oversightNotes" class="event-log"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="clinicianTab" class="tab-panel">
+          <div class="grid-two">
+            <article id="clinicianPlanCard" class="card">
+              <div class="card-title-row">
+                <h2>Clinician Cockpit - Plan Review</h2>
+                <span class="pill">Received from Care</span>
+              </div>
+              <div id="clinicianPlanSummary" class="summary"></div>
+              <div class="timeline-wrap">
+                <img id="clinicianTimelineImage" src="timeline.svg" alt="Prenatal timeline shown to clinician" />
+              </div>
+            </article>
+
+            <article id="agentCard" class="card">
+              <div class="card-title-row">
+                <h2>MedGemma Agent Window</h2>
+                <span class="pill">Clinician edits</span>
+              </div>
+              <label>
+                Agent instruction
+                <textarea id="agentInstructionInput" rows="3" placeholder="Example: Keep key milestone visits in person, move counseling-focused check-ins to telemedicine, and assign CHW follow-up."></textarea>
+              </label>
+              <div class="form-actions">
+                <button id="applyAgentBtn" type="button" class="btn btn-primary">Apply Agent Modification</button>
+              </div>
+              <div id="agentChangesLog" class="event-log"></div>
+            </article>
+          </div>
+
+          <article id="medasrCard" class="card">
             <div class="card-title-row">
-              <h2>MedGemma Agent Window</h2>
-              <span class="pill">Clinician edits</span>
+              <h2>MedASR Patient-Clinician Transcription</h2>
+              <span class="pill">Live transcription simulation</span>
             </div>
-            <label>
-              Agent instruction
-              <textarea id="agentInstructionInput" rows="3" placeholder="Example: Move week 24 glucose screening to in-person and add BP tele-check at week 25."></textarea>
-            </label>
             <div class="form-actions">
-              <button id="applyAgentBtn" type="button" class="btn btn-primary">Apply Agent Modification</button>
+              <button id="simulateTranscriptionBtn" type="button" class="btn btn-secondary">Add Transcription Segment</button>
             </div>
-            <div id="agentChangesLog" class="event-log"></div>
+            <div id="transcriptionLog" class="messages compact"></div>
           </article>
-        </div>
+        </section>
+      </main>
+    </section>
 
-        <article id="medasrCard" class="card">
-          <div class="card-title-row">
-            <h2>MedASR Patient-Clinician Transcription</h2>
-            <span class="pill">Live transcription simulation</span>
-          </div>
-          <div class="form-actions">
-            <button id="simulateTranscriptionBtn" type="button" class="btn btn-secondary">Add Transcription Segment</button>
-          </div>
-          <div id="transcriptionLog" class="messages compact"></div>
+    <section id="aboutPage" class="page-panel">
+      <div class="about-grid">
+        <article class="card about-card about-wide">
+          <h2>Motivation</h2>
+          <p>
+            Prenatal care is care provided to birthing people, including medical care, screening tests, answers to your questions, and help finding social support and community resources during pregnancy.
+          </p>
+          <p>
+            <i>“Prenatal care can improve the detection and management of chronic conditions and pregnancy complications, particularly for individuals with an increased risk of adverse outcomes” </i> - ACOG
+          </p>
+          <p>
+            About 4 million pregnant people access prenatal care each year in the United States. At this scale, fixed,
+            one-size-fits-all workflows can miss practical barriers and increase the risk of delayed follow-up.
+          </p>
+          <p>
+            The core problem is aligning medically important milestones with real-life access constraints so that patients
+            can consistently complete recommended care.
+          </p>
         </article>
-      </section>
-    </main>
+
+        <article class="card about-card">
+          <h2>Proposed Solution</h2>
+          <p>
+            Provide an LLM-based agentic system that allows providing prenatal care in a safe, scalable, and aligned manner allowing all stakeholders to help expand provision of care and redirect efforts to improving care.
+          </p>
+          <p>
+            In collaboration with expert clinicians, we present PATHFinder, an agentic system built powered by MedGemma, MedASR, Gemini-2.5-Pro, and Gemini-TTS to provide care to patients, conversational and clinical oversight to enable tailored prenatal care planning.
+          </p>
+        </article>
+
+        <article class="card about-card">
+          <h2>Team</h2>
+          <div class="team-grid">
+            <figure class="team-member">
+              <img class="team-photo" src="alex_peahl.jpeg" alt="Dr. Alex Peahl" />
+              <figcaption>
+                <span class="team-name">Dr. Alex Peahl</span>
+                <span class="team-role">Assistant Professor, Obstetrics and Gynecology (Author: ACOG prenatal tailoring guidelines)</span>
+              </figcaption>
+            </figure>
+            <figure class="team-member">
+              <img class="team-photo" src="samia_abdenlabi.jpeg" alt="Dr. Samia Abdelnabi" />
+              <figcaption>
+                <span class="team-name">Dr. Samia Abdelnabi</span>
+                <span class="team-role">Clinical Assistant Professor, Health Behavior and Clinical Sciences</span>
+              </figcaption>
+            </figure>
+            <figure class="team-member">
+              <img class="team-photo" src="liz_bondi_kelly.jpeg" alt="Dr. Liz Bondi-Kelly" />
+              <figcaption>
+                <span class="team-name">Dr. Liz Bondi-Kelly</span>
+                <span class="team-role">Assistant Professor, Computer Science and Engineering</span>
+              </figcaption>
+            </figure>
+            <figure class="team-member">
+              <img class="team-photo" src="vaibhav_balloli.jpeg" alt="Vaibhav Balloli" />
+              <figcaption>
+                <span class="team-name">Vaibhav Balloli</span>
+                <span class="team-role">Third-year PhD Candidate, Computer Science and Engineering</span>
+              </figcaption>
+            </figure>
+          </div>
+        </article>
+
+        <article class="card about-card about-wide">
+          <h2>Impact</h2>
+          <p>
+            The expected impact is earlier risk visibility, better adherence to key prenatal milestones, and fewer missed
+            visits by tailoring modality and support pathways to transportation, childcare, and nutrition needs.
+          </p>
+        </article>
+      </div>
+    </section>
   </div>
   <script src="app.js"></script>
 </body>
