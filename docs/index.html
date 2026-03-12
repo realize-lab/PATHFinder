@@ -3,307 +3,293 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PATHFinder + MedGemma</title>
+  <title>PATHFinder - Prenatal Care Demo</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="page-shell">
-    <header id="topNav" class="card top-nav">
-      <div class="nav-main">
-        <a id="brandHomeBtn" class="nav-brand" href="#">
-          <span class="brand-copy">
-            <span class="brand-title">PATHFinder Agent</span>
-            <span class="brand-subtitle">Tailored Prenatal Care</span>
-          </span>
-        </a>
-        <div class="nav-actions">
-          <button id="themeToggleBtn" class="theme-toggle" type="button" aria-label="Toggle dark and light mode">
-            <span id="themeToggleIcon" class="theme-toggle-icon" aria-hidden="true">☀</span>
-            <span id="themeToggleLabel">Light</span>
-          </button>
-          <div class="nav-logo-cluster" aria-label="Brand logos">
-            <span class="nav-logo-badge">
-              <img class="nav-logo-image" src="logo.png" alt="Project logo" />
-            </span>
-            <span class="nav-logo-badge">
-              <img class="nav-logo-image" src="michigan_logo.png" alt="University of Michigan logo" />
-            </span>
-          </div>
-          <button id="mobileMenuBtn" class="mobile-menu-btn" type="button" aria-label="Open navigation menu" aria-expanded="false">
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+    <!-- ===== Unified Top Bar ===== -->
+    <header class="top-bar">
+      <!-- Left: Logo + brand + description -->
+      <div class="tb-left">
+        <img class="tb-logo" src="logo.png" alt="PATHFinder logo" />
+        <div class="tb-brand">
+          <span class="tb-title">PATHFinder Agent</span>
+          <span class="tb-desc">Planner for Appropriate Tailored Healthcare</span>
         </div>
       </div>
-      <nav id="primaryNavLinks" class="nav-links" aria-label="Main navigation">
-        <button class="nav-link page-tab-btn active" data-page-target="demoPage" type="button">Demo</button>
-        <button class="nav-link page-tab-btn" data-page-target="aboutPage" type="button">About</button>
+      <!-- Center: Demo / About tabs -->
+      <nav class="tb-center" aria-label="Main navigation">
+        <button class="page-tab-btn active" data-page-target="demoPage" type="button">Demo</button>
+        <button class="page-tab-btn" data-page-target="aboutPage" type="button">About</button>
       </nav>
-    </header>
-
-    <header class="card hero">
-      <div>
-        <p class="eyebrow">Interactive End-to-End Demo</p>
-        <h1>PATHFinder Agent: Planner for Appropriate Tailored Healthcare Finder Agent</h1>
-        <h3>Intuitive, interactive agentic systems for patients, nurses, and clinicians to provide prenatal care</h3>
-        <p class="hero-copy">
-          Example single-patient workflow: data collection, shared planning, and
-          care-delivery adjustments based on social needs and access.
-        </p>
+      <!-- Right: Michigan logo + theme toggle -->
+      <div class="tb-right">
+        <img class="tb-michigan" src="michigan_logo.png" alt="University of Michigan" />
+        <button id="themeToggleBtn" class="theme-toggle" type="button" aria-label="Toggle theme">
+          <span id="themeToggleIcon" class="theme-toggle-icon" aria-hidden="true"></span>
+          <span id="themeToggleLabel">Light</span>
+        </button>
       </div>
     </header>
 
+    <!-- ===== DEMO PAGE ===== -->
     <section id="demoPage" class="page-panel active">
-      <section class="card step-controls">
-        <button id="prevStepBtn" class="btn btn-secondary" type="button">Previous</button>
-        <div id="stepLabel" class="step-label">Step 1</div>
-        <button id="nextStepBtn" class="btn btn-primary" type="button">Next</button>
+      <!-- Controls row: prev/next + step dots + autoplay -->
+      <section class="controls-row">
+        <button id="prevBtn" class="btn btn-secondary btn-sm" disabled>Prev</button>
+        <div class="step-dots">
+          <div class="step-dot active" data-step="0">1</div>
+          <div class="step-connector"></div>
+          <div class="step-dot" data-step="1">2</div>
+          <div class="step-connector"></div>
+          <div class="step-dot" data-step="2">3</div>
+          <div class="step-connector"></div>
+          <div class="step-dot" data-step="3">4</div>
+        </div>
+        <span id="phaseLabel" class="phase-label">Phase 1 of 4: Intake Form</span>
+        <div class="autoplay-wrap">
+          <label class="autoplay-label"><input type="checkbox" id="autoplayToggle" /> Autoplay</label>
+          <select id="autoplayDelay" class="delay-select">
+            <option value="5000">5s</option>
+            <option value="8000" selected>8s</option>
+            <option value="12000">12s</option>
+            <option value="16000">16s</option>
+          </select>
+        </div>
+        <button id="nextBtn" class="btn btn-primary btn-sm">Next</button>
       </section>
 
-      <section id="commentaryBox" class="card commentary">
-        <h2 id="commentaryTitle">Step commentary</h2>
-        <p id="commentaryText"></p>
-        <ul id="commentaryBullets"></ul>
+      <!-- Commentary -->
+      <section id="commentaryBox" class="commentary-row">
+        <strong id="commentaryTitle"></strong>
+        <span class="commentary-sep">&mdash;</span>
+        <span id="commentaryText"></span>
       </section>
 
-      <nav class="card tabs" aria-label="Workflow tabs">
-        <button class="tab-btn active" data-tab-target="careTab">Care</button>
-        <button class="tab-btn" data-tab-target="oversightTab">Oversight Cockpit</button>
-        <button class="tab-btn" data-tab-target="clinicianTab">Clinician Cockpit</button>
-      </nav>
+      <!-- ===== Phase 1: Intake Form ===== -->
+      <main id="phase-intake" class="phase-panel active phase-content">
+        <div class="intake-tabs-row">
+          <button class="intake-tab" data-itab="ehr">EHR Data</button>
+          <button class="intake-tab active-itab" data-itab="personal">2&nbsp; Personal Information</button>
+          <button class="intake-tab" data-itab="health">3&nbsp; Health History</button>
+          <button class="intake-tab" data-itab="allergies">4&nbsp; Allergies</button>
+          <button class="intake-tab" data-itab="social">5&nbsp; Social &amp; Environmental</button>
+        </div>
+        <div class="intake-progress"><div class="intake-progress-fill" id="intakeProgressFill"></div></div>
 
-      <main>
-        <section id="careTab" class="tab-panel active">
-          <div class="grid-two">
-            <article id="patientProfileCard" class="card">
-              <div class="card-title-row">
-                <h2>Prenatal Intake Snapshot</h2>
-                <span class="pill">Main pipeline fields pre-filled</span>
-              </div>
+        <div class="intake-scroll">
+          <div class="intake-content" id="itab-personal">
+            <div class="intake-card">
+              <h3>Personal Information</h3>
               <div class="form-grid">
-                <label>
-                  Patient First Name
-                  <input type="text" id="patientFirstNameField" value="Danielle" disabled />
-                </label>
-                <label>
-                  Patient Last Name
-                  <input type="text" id="patientLastNameField" value="Carter" disabled />
-                </label>
-                <label>
-                  Date of Birth
-                  <input type="text" id="patientDobField" value="1992-11-03" disabled />
-                </label>
-                <label>
-                  Gravida/Para
-                  <input type="text" id="patientObHistoryField" value="G2P1" disabled />
-                </label>
-                <label>
-                  Gender
-                  <input type="text" id="patientGenderField" value="Female" disabled />
-                </label>
-                <label>
-                  Previous health conditions
-                  <input type="text" id="prevHealthField" value="Chronic hypertension (controlled)" disabled />
-                </label>
-                <label>
-                  Current health problems or symptoms
-                  <input type="text" id="currentSymptomsField" value="Mild nausea, occasional headache" disabled />
-                </label>
-                <label>
-                  Current Medications
-                  <input type="text" id="currentMedsField" value="Prenatal vitamin, aspirin 81 mg nightly" disabled />
-                </label>
-                <label>
-                  Standard Allergies
-                  <input type="text" id="standardAllergiesField" value="Penicillin (rash)" disabled />
-                </label>
-                <label>
-                  Baseline social context
-                  <input type="text" id="baselineSocialField" value="Single parent, hourly job, limited transportation" disabled />
-                </label>
-                <label class="span-2" id="lmpFieldWrap">
-                  Last Menstrual Period (LMP) - required to calculate gestation/EDD
-                  <input type="date" id="lmpDateInput" />
-                </label>
-                <div class="span-2 form-actions">
-                  <button id="confirmLmpBtn" type="button" class="btn btn-primary">Confirm LMP and Continue</button>
-                </div>
+                <label>First Name <input type="text" value="V" disabled /></label>
+                <label>Last Name <input type="text" value="B" disabled /></label>
+                <label>Date of Birth <input type="text" value="01/01/1999" disabled /></label>
+                <label>Gender <input type="text" value="Female" disabled /></label>
+                <label>Pronouns <input type="text" value="She/Her" disabled /></label>
               </div>
-            </article>
-
-            <article id="modalityCard" class="card">
-              <div class="card-title-row">
-                <h2>Care Chat + Embedded Social Needs Form</h2>
-                <span class="pill">MedGemma + Gemini UI</span>
-              </div>
-              <div id="careChatBox" class="messages compact"></div>
-            </article>
+            </div>
           </div>
-
-          <article id="planReportCard" class="card">
-            <div class="card-title-row">
-              <h2>Tailored Prenatal Plan Report (Week 8 -> Week 39)</h2>
-              <span class="pill">Medical milestones + social adjustments</span>
-            </div>
-            <div id="planSummary" class="summary"></div>
-            <div class="table-wrap">
-              <table id="visitTable">
-                <thead>
-                  <tr>
-                    <th>Visit</th>
-                    <th>Week</th>
-                    <th>Modality</th>
-                    <th>Tests / Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="visitTableBody"></tbody>
-              </table>
-            </div>
-            <div class="timeline-wrap">
-              <img id="careTimelineImage" src="timeline.svg" alt="Tailored prenatal timeline with key milestones" />
-            </div>
-          </article>
-        </section>
-
-        <section id="oversightTab" class="tab-panel">
-          <div class="grid-two">
-            <article id="oversightStatusCard" class="card">
-              <div class="card-title-row">
-                <h2>Oversight Cockpit</h2>
-                <span class="pill">High-level status only</span>
+          <div class="intake-content hidden" id="itab-health">
+            <div class="intake-card">
+              <h3>Health History</h3>
+              <div class="form-grid-single">
+                <label>Last Menstrual Period (LMP) <input type="date" id="lmpInput" value="2025-12-04" /></label>
+                <label>Previous health conditions <input type="text" value="None" disabled /></label>
+                <label>Surgeries or hospitalizations <input type="text" value="None" disabled /></label>
+                <label>Current health problems or symptoms <input type="text" value="High blood pressure" disabled /></label>
               </div>
-              <div id="oversightStatuses" class="status-list"></div>
-              <div class="divider"></div>
-              <div class="form-actions">
-                <button id="takeoverBtn" type="button" class="btn btn-primary">Take Over</button>
-                <span id="takeoverState" class="pill">Takeover inactive</span>
-              </div>
-            </article>
-
-            <article class="card">
-              <div class="card-title-row">
-                <h2>Oversight Notes</h2>
-                <span class="pill">No full transcript shown</span>
-              </div>
-              <div id="oversightNotes" class="event-log"></div>
-            </article>
+            </div>
           </div>
-        </section>
-
-        <section id="clinicianTab" class="tab-panel">
-          <div class="grid-two">
-            <article id="clinicianPlanCard" class="card">
-              <div class="card-title-row">
-                <h2>Clinician Cockpit - Plan Review</h2>
-                <span class="pill">Received from Care</span>
+          <div class="intake-content hidden" id="itab-allergies">
+            <div class="intake-card">
+              <h3>Allergies</h3>
+              <div class="form-grid-single">
+                <label>Known Allergies <input type="text" value="None reported" disabled /></label>
+                <label>Drug Allergies <input type="text" value="None reported" disabled /></label>
               </div>
-              <div id="clinicianPlanSummary" class="summary"></div>
-              <div class="timeline-wrap">
-                <img id="clinicianTimelineImage" src="timeline.svg" alt="Prenatal timeline shown to clinician" />
-              </div>
-            </article>
-
-            <article id="agentCard" class="card">
-              <div class="card-title-row">
-                <h2>MedGemma Agent Window</h2>
-                <span class="pill">Clinician edits</span>
-              </div>
-              <label>
-                Agent instruction
-                <textarea id="agentInstructionInput" rows="3" placeholder="Example: Keep key milestone visits in person, move counseling-focused check-ins to telemedicine, and assign CHW follow-up."></textarea>
-              </label>
-              <div class="form-actions">
-                <button id="applyAgentBtn" type="button" class="btn btn-primary">Apply Agent Modification</button>
-              </div>
-              <div id="agentChangesLog" class="event-log"></div>
-            </article>
+            </div>
           </div>
+          <div class="intake-content hidden" id="itab-social">
+            <div class="intake-card">
+              <h3>Social &amp; Environmental Factors</h3>
+              <div class="form-grid">
+                <label>Housing Status <input type="text" value="Stable housing" disabled /></label>
+                <label>Transportation <input type="text" value="Limited - public transit" disabled /></label>
+                <label>Employment <input type="text" value="Part-time employed" disabled /></label>
+                <label>Food Security <input type="text" value="Occasionally insecure" disabled /></label>
+                <label>Support System <input type="text" value="Lives with partner" disabled /></label>
+                <label>Primary Language <input type="text" value="English" disabled /></label>
+              </div>
+            </div>
+          </div>
+          <div class="intake-content hidden" id="itab-ehr">
+            <div class="intake-card">
+              <h3>EHR Data Import</h3>
+              <div class="form-grid">
+                <label>MRN <input type="text" value="MRN-20260001" disabled /></label>
+                <label>Insurance <input type="text" value="Medicaid" disabled /></label>
+                <label>Primary Provider <input type="text" value="Dr. Smith, OB/GYN" disabled /></label>
+                <label>Gravida/Para <input type="text" value="G1P0" disabled /></label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="intake-actions">
+          <button id="submitIntakeBtn" class="btn btn-primary btn-sm">Submit Intake &amp; Continue</button>
+        </div>
+      </main>
 
-          <article id="medasrCard" class="card">
-            <div class="card-title-row">
-              <h2>MedASR Patient-Clinician Transcription</h2>
-              <span class="pill">Live transcription simulation</span>
+      <!-- ===== Phase 2: PATHFinder Agent Questions ===== -->
+      <main id="phase-questions" class="phase-panel phase-content">
+        <div class="questions-layout">
+          <aside class="sidebar-summary">
+            <div class="sidebar-section">PERSONAL</div>
+            <div class="sf-row"><span class="sf-label">Name</span><span class="sf-value">V B</span></div>
+            <div class="sf-row"><span class="sf-label">DOB</span><span class="sf-value">01/01/1999</span></div>
+            <div class="sf-row"><span class="sf-label">Gender</span><span class="sf-value">Female</span></div>
+            <div class="sidebar-section">HEALTH</div>
+            <div class="sf-row"><span class="sf-label">Current</span><span class="sf-value">High BP</span></div>
+            <div class="sf-row"><span class="sf-label">LMP</span><span class="sf-value">2025-12-04</span></div>
+            <div class="sidebar-section">SOCIAL</div>
+            <div class="sf-row"><span class="sf-label">Transport</span><span class="sf-value">Limited</span></div>
+            <div class="sf-row"><span class="sf-label">Food</span><span class="sf-value">Insecure</span></div>
+          </aside>
+          <div class="questions-main">
+            <div class="questions-top-row">
+              <img class="q-logo" src="logo.png" alt="" />
+              <strong>Form EHR Workflow</strong>
+              <span class="muted-text">V B</span>
+              <div class="stepper-mini">
+                <span class="sm-dot sm-active">Questions</span>
+                <span class="sm-line"></span>
+                <span class="sm-dot">Care Plan</span>
+              </div>
             </div>
-            <div class="form-actions">
-              <button id="simulateTranscriptionBtn" type="button" class="btn btn-secondary">Add Transcription Segment</button>
+            <div id="questionProgress" class="question-progress">
+              <span>Question 1 of 4</span>
+              <div class="q-progress-bar"><div class="q-progress-fill" style="width:0%"></div></div>
+              <span>0%</span>
             </div>
-            <div id="transcriptionLog" class="messages compact"></div>
-          </article>
-        </section>
+            <div id="questionArea" class="question-area"></div>
+            <div class="chat-input-row">
+              <input type="text" id="questionChatInput" placeholder="Type your message..." />
+              <button class="btn btn-primary btn-sm">Send</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ===== Phase 3: Patient Report Review ===== -->
+      <main id="phase-report" class="phase-panel phase-content">
+        <div class="report-top-row">
+          <img class="q-logo" src="logo.png" alt="" />
+          <strong>Draft Report Review</strong>
+          <span class="muted-text">V B</span>
+          <div class="stepper-mini">
+            <span class="sm-dot sm-done">Questions</span>
+            <span class="sm-line sm-line-done"></span>
+            <span class="sm-dot sm-active">Care Plan</span>
+          </div>
+        </div>
+        <div class="three-panel">
+          <div class="panel-card">
+            <h3>Report</h3>
+            <div id="reportContent" class="panel-scroll"></div>
+          </div>
+          <div class="panel-card">
+            <h3>Care Timeline</h3>
+            <div id="timelineContent" class="panel-scroll"></div>
+          </div>
+          <div class="panel-card chat-panel">
+            <h3>Ask About Report &amp; Timeline</h3>
+            <div id="patientChatMessages" class="chat-messages"></div>
+            <div class="chat-input-row">
+              <input type="text" id="patientChatInput" placeholder="Ask about selected text..." />
+              <button class="btn btn-primary btn-sm">Send</button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- ===== Phase 4: Clinician Review ===== -->
+      <main id="phase-clinician" class="phase-panel phase-content">
+        <div class="clinician-top-row">
+          <strong>Clinician Review - V B</strong>
+          <span class="muted-text">form_ehr | Created: 2/26/2026</span>
+          <div class="clinician-status-btns">
+            <button class="btn btn-outline btn-xs status-active">In Review</button>
+            <button class="btn btn-outline btn-xs">Reviewed</button>
+            <button class="btn btn-outline btn-xs btn-warn">Needs Attention</button>
+          </div>
+        </div>
+        <div class="three-panel">
+          <div class="panel-card">
+            <h3>AI Generated Summary</h3>
+            <div id="clinicianSummary" class="panel-scroll"></div>
+          </div>
+          <div class="panel-card">
+            <div class="panel-tabs">
+              <button class="panel-tab active-ptab" data-ptab="reportPdf">Report PDF</button>
+              <button class="panel-tab" data-ptab="careTimeline">Care Timeline</button>
+            </div>
+            <div id="ptab-reportPdf" class="panel-scroll ptab-content"></div>
+            <div id="ptab-careTimeline" class="panel-scroll ptab-content hidden"></div>
+          </div>
+          <div class="panel-card chat-panel">
+            <h3>Clinician Chat</h3>
+            <div id="clinicianChatMessages" class="chat-messages"></div>
+            <div class="clinician-action-btns">
+              <button class="btn btn-outline btn-xs action-btn">Search Medical Online</button>
+              <button class="btn btn-outline btn-xs action-btn">Modify Report</button>
+              <button class="btn btn-outline btn-xs action-btn">Modify Timeline</button>
+              <button class="btn btn-outline btn-xs action-btn">Flag Concern</button>
+            </div>
+            <div class="chat-input-row">
+              <input type="text" id="clinicianChatInput" placeholder="Type a message or use suggestions..." />
+              <button class="btn btn-primary btn-sm">Send</button>
+            </div>
+          </div>
+        </div>
       </main>
     </section>
 
-    <section id="aboutPage" class="page-panel">
+    <!-- ===== ABOUT PAGE ===== -->
+    <section id="aboutPage" class="page-panel about-scroll">
       <div class="about-grid">
         <article class="card about-card about-wide">
           <h2>Motivation</h2>
-          <p>
-            Prenatal care is care provided to birthing people, including medical care, screening tests, answers to your questions, and help finding social support and community resources during pregnancy.
-          </p>
-          <p>
-            <i>“Prenatal care can improve the detection and management of chronic conditions and pregnancy complications, particularly for individuals with an increased risk of adverse outcomes” </i> - ACOG
-          </p>
-          <p>
-            About 4 million pregnant people access prenatal care each year in the United States. At this scale, fixed,
-            one-size-fits-all workflows can miss practical barriers and increase the risk of delayed follow-up.
-          </p>
-          <p>
-            The core problem is aligning medically important milestones with real-life access constraints so that patients
-            can consistently complete recommended care.
-          </p>
+          <p>Prenatal care is care provided to birthing people, including medical care, screening tests, answers to your questions, and help finding social support and community resources during pregnancy.</p>
+          <p><i>"Prenatal care can improve the detection and management of chronic conditions and pregnancy complications, particularly for individuals with an increased risk of adverse outcomes"</i> - ACOG</p>
+          <p>About 4 million pregnant people access prenatal care each year in the United States. At this scale, fixed, one-size-fits-all workflows can miss practical barriers and increase the risk of delayed follow-up.</p>
+          <p>The core problem is aligning medically important milestones with real-life access constraints so that patients can consistently complete recommended care.</p>
         </article>
-
         <article class="card about-card">
-          <h2>Proposed Solution</h2>
-          <p>
-            Provide an LLM-based agentic system that allows providing prenatal care in a safe, scalable, and aligned manner allowing all stakeholders to help expand provision of care and redirect efforts to improving care.
-          </p>
-          <p>
-            In collaboration with expert clinicians, we present PATHFinder, an agentic system built powered by MedGemma, MedASR, Gemini-2.5-Pro, and Gemini-TTS to provide care to patients, conversational and clinical oversight to enable tailored prenatal care planning.
-          </p>
+          <h2>PATHFinder Proposal</h2>
+          <p>Provide an LLM-based agentic system that allows providing prenatal care in a safe, scalable, and aligned manner allowing all stakeholders to help expand provision of care and redirect efforts to improving care.</p>
+          <p>In collaboration with expert clinicians, we present PATHFinder, an agentic system to provide care to patients, conversational and clinical oversight to enable tailored prenatal care planning.</p>
         </article>
-
         <article class="card about-card">
           <h2>Team</h2>
           <div class="team-grid">
             <figure class="team-member">
-              <img class="team-photo" src="alex_peahl.jpeg" alt="Dr. Alex Peahl" />
-              <figcaption>
-                <span class="team-name">Dr. Alex Peahl</span>
-                <span class="team-role">Assistant Professor, Obstetrics and Gynecology (Author: ACOG prenatal tailoring guidelines)</span>
-              </figcaption>
+              <img class="team-photo" src="vaibhav_balloli.jpeg" alt="Vaibhav Balloli" />
+              <figcaption><span class="team-name">Vaibhav Balloli</span><span class="team-role">PhD Candidate, CSE</span></figcaption>
             </figure>
             <figure class="team-member">
               <img class="team-photo" src="samia_abdenlabi.jpeg" alt="Dr. Samia Abdelnabi" />
-              <figcaption>
-                <span class="team-name">Dr. Samia Abdelnabi</span>
-                <span class="team-role">Clinical Assistant Professor, Health Behavior and Clinical Sciences</span>
-              </figcaption>
+              <figcaption><span class="team-name">Dr. Samia Abdelnabi</span><span class="team-role">Clinical Asst. Professor, Health Behavior</span></figcaption>
+            </figure>
+            <figure class="team-member">
+              <img class="team-photo" src="alex_peahl.jpeg" alt="Dr. Alex Peahl" />
+              <figcaption><span class="team-name">Dr. Alex Peahl</span><span class="team-role">Asst. Professor, OB/GYN (ACOG guidelines author)</span></figcaption>
             </figure>
             <figure class="team-member">
               <img class="team-photo" src="liz_bondi_kelly.jpeg" alt="Dr. Liz Bondi-Kelly" />
-              <figcaption>
-                <span class="team-name">Dr. Liz Bondi-Kelly</span>
-                <span class="team-role">Assistant Professor, Computer Science and Engineering</span>
-              </figcaption>
-            </figure>
-            <figure class="team-member">
-              <img class="team-photo" src="vaibhav_balloli.jpeg" alt="Vaibhav Balloli" />
-              <figcaption>
-                <span class="team-name">Vaibhav Balloli</span>
-                <span class="team-role">Third-year PhD Candidate, Computer Science and Engineering</span>
-              </figcaption>
+              <figcaption><span class="team-name">Dr. Liz Bondi-Kelly</span><span class="team-role">Asst. Professor, CSE</span></figcaption>
             </figure>
           </div>
-        </article>
-
-        <article class="card about-card about-wide">
-          <h2>Impact</h2>
-          <p>
-            The expected impact is earlier risk visibility, better adherence to key prenatal milestones, and fewer missed
-            visits by tailoring modality and support pathways to transportation, childcare, and nutrition needs.
-          </p>
         </article>
       </div>
     </section>

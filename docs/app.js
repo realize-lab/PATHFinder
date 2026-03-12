@@ -1,961 +1,673 @@
-const STEP_DEFS = [
-  {
-    title: "Step 1 - Intake profile loaded from EHR",
-    text:
-      "Care starts with a prefilled profile plus social context, then confirms key timeline details needed for coordinated planning.",
-    bullets: [
-      "Baseline case: G2P1 patient with chronic hypertension on low-dose aspirin.",
-      "Begin with an early whole-person needs assessment.",
-      "No oversight escalation is needed at baseline intake.",
-    ],
-    tab: "careTab",
-    highlights: ["patientProfileCard", "lmpFieldWrap"],
-  },
-  {
-    title: "Step 2 - LMP confirmed and EDD calculated",
-    text:
-      "After LMP is captured, MedGemma computes EDD and anchors a predictable timeline for key check-ins and milestones.",
-    bullets: [
-      "Timeline anchor is now available for schedule generation.",
-      "Care chat can now move to social-needs and access screening.",
-      "Oversight receives high-level intake completion only.",
-    ],
-    tab: "careTab",
-    highlights: ["lmpFieldWrap", "commentaryBox"],
-  },
-  {
-    title: "Step 3 - Social needs + care model requested in chat",
-    text:
-      "MedGemma asks the patient to complete an embedded Gemini form covering care preferences and social drivers of health.",
-    bullets: [
-      "Guideline-aligned social domains include transportation, caregiving, and food access.",
-      "Form is embedded directly in chat and captured as structured data.",
-      "Data will be used to adjust modality and support referrals.",
-    ],
-    tab: "careTab",
-    highlights: ["modalityCard", "careChatBox"],
-  },
-  {
-    title: "Step 4 - Tailoring form submitted",
-    text:
-      "The patient submits care model preference and unmet social needs. MedGemma converts these selections into scheduling and referral constraints.",
-    bullets: [
-      "Care plan keeps essential in-person milestones while using flexible follow-up where appropriate.",
-      "Resource mapping is generated from social needs and local support options.",
-      "Care status advances to plan-generation ready.",
-    ],
-    tab: "careTab",
-    highlights: ["careChatBox", "llmTailoredForm"],
-  },
-  {
-    title: "Step 5 - Tailored prenatal plan generated",
-    text:
-      "A tailored plan is generated across Week 8 to Week 39, combining core prenatal milestones with social-needs-informed adjustments.",
-    bullets: [
-      "Includes core phases: onboarding, mid-pregnancy review, late-pregnancy preparation, and handoff planning.",
-      "Flexible modality is used when appropriate to reduce access burden.",
-      "Referrals are attached for childcare, transportation, and nutrition support.",
-    ],
-    tab: "careTab",
-    highlights: ["planReportCard", "careTimelineImage"],
-  },
-  {
-    title: "Step 6 - Oversight cockpit review",
-    text:
-      "Oversight shows high-level quality and safety markers without exposing full transcript details. Nurse can activate takeover when policy or safety needs intervention.",
-    bullets: [
-      "Shows intake, social screening, plan generation, and referral state.",
-      "Tracks unresolved social-resource follow-up at a status level.",
-      "Maintains role-based privacy boundaries for chat content.",
-    ],
-    tab: "oversightTab",
-    highlights: ["oversightStatusCard", "takeoverBtn"],
-  },
-  {
-    title: "Step 7 - Clinician handoff and plan review",
-    text:
-      "Clinician Cockpit receives the generated plan and uses the MedGemma agent to make targeted modifications based on patient context and logistics.",
-    bullets: [
-      "Clinician sees EDD, risk context, medical milestones, and social referrals.",
-      "Agent supports natural-language edits with tracked change logs.",
-      "Timeline is shared between care and clinician views.",
-    ],
-    tab: "clinicianTab",
-    highlights: ["clinicianPlanCard", "agentCard"],
-  },
-  {
-    title: "Step 8 - MedASR transcript informs refinement",
-    text:
-      "Conversation snippets are transcribed with MedASR and fed to MedGemma for final workflow refinements before ongoing prenatal follow-up.",
-    bullets: [
-      "Transcript captures practical barriers like transportation delays and childcare windows.",
-      "Clinician can apply transcript-informed modifications immediately.",
-      "Demo closes the loop across care, oversight, and clinician workflows.",
-    ],
-    tab: "clinicianTab",
-    highlights: ["medasrCard", "transcriptionLog", "applyAgentBtn"],
-  },
-];
+/* ========================================================
+   PATHFinder Demo – app.js
+   4-phase prenatal care workflow based on ACOG guidelines
+   ======================================================== */
 
-const PREFILLED_PIPELINE_FIELDS = {
-  patient_first_name: "Danielle",
-  patient_last_name: "Carter",
-  patient_dob: "1992-11-03",
-  patient_ob_history: "G2P1",
+// ── Patient Data ──
+const PATIENT = {
+  firstName: "V",
+  lastName: "B",
+  dob: "01/01/1999",
   gender: "Female",
-  previous_health_conditions: "Chronic hypertension (controlled)",
-  current_health_problems: "Mild nausea, occasional headache",
-  current_medications: "Prenatal vitamin, aspirin 81 mg nightly",
-  standard_allergies: "Penicillin (rash)",
-  baseline_social_context: "Single parent, hourly retail work, limited transportation",
+  pronouns: "She/Her",
+  lmp: "2025-12-04",
+  edd: "2026-09-11",
+  gestAge: "Approximately 12 weeks by LMP",
+  prevConditions: "None",
+  currentProblems: "High blood pressure",
+  allergies: "None reported",
+  transportation: "Limited - relies on public transit",
+  foodSecurity: "Occasionally food insecure",
+  employment: "Part-time employed",
+  housing: "Stable housing",
+  insurance: "Medicaid",
+  gravPara: "G1P0",
 };
 
-const CARE_MODEL_OPTIONS = [
-  "Targeted schedule: in-person for key tests, telemedicine for counseling/follow-up",
-  "Traditional schedule: mostly in-person visits",
-  "Telemedicine-heavy schedule when clinically safe",
+// ── ACOG Visit Schedule (Greater Than Average Risk – chronic hypertension) ──
+const VISIT_SCHEDULE = [
+  { week: 6,  visit: "Intake",  modality: "In-Person",    actions: "Initial history, risk assessment, routine prenatal labs (CBC, blood type, Rh(D), antibody screen, urinalysis, HBsAg, Hep C, HIV, syphilis, rubella, GC/CT, hemoglobinopathy)" },
+  { week: 8,  visit: "Visit 1", modality: "In-Person",    actions: "Physical exam, BP assessment, aneuploidy screening discussion (cell-free DNA), early diabetes screen" },
+  { week: 12, visit: "Visit 2", modality: "Telemedicine",  actions: "Review initial lab results, discuss genetic screening options, answer early pregnancy questions" },
+  { week: 16, visit: "Visit 3", modality: "Telemedicine",  actions: "Check-in on symptoms, review home blood pressure log, discuss nutrition and weight gain" },
+  { week: 18, visit: "US",      modality: "Imaging",       actions: "Detailed anatomy ultrasound to check on the baby's development" },
+  { week: 20, visit: "Visit 4", modality: "Telemedicine",  actions: "Review ultrasound results, discuss fetal movement, and plan for second half of pregnancy" },
+  { week: 24, visit: "Visit 5", modality: "In-Person",     actions: "Physical exam, measure fundal height, listen to fetal heart tones, review blood pressure log" },
+  { week: 26, visit: "Visit 6", modality: "Telemedicine",  actions: "Check-in on well-being, discuss signs of preterm labor, select a newborn care clinician" },
+  { week: 28, visit: "Visit 7", modality: "In-Person",     actions: "Glucose screening (GTT), complete blood count (CBC), Tdap vaccination, Rh(D) immunoglobulin if needed" },
+  { week: 30, visit: "Visit 8", modality: "Telemedicine",  actions: "Review lab results, discuss birth preferences and planning, infant feeding education" },
+  { week: 32, visit: "Visit 9", modality: "In-Person",     actions: "Physical exam, check fetal presentation, discuss signs of preeclampsia in detail" },
+  { week: 34, visit: "Visit 10",modality: "In-Person",     actions: "Fetal presentation check, continue monitoring blood pressure, GBS screen" },
+  { week: 36, visit: "Visit 11",modality: "In-Person",     actions: "Physical exam, review birth plan, discuss labor signs, preeclampsia warning signs" },
+  { week: 37, visit: "Visit 12",modality: "Telemedicine",  actions: "Final check-in, FMLA/disability forms, postpartum depression awareness, seat belt use" },
+  { week: 38, visit: "Visit 13",modality: "In-Person",     actions: "Final assessment, confirm delivery plan, post-term counseling if applicable, RSV vaccine (seasonal)" },
 ];
 
-const SOCIAL_NEED_OPTIONS = [
+// ── PATHFinder Agent Questions (dynamic UI) ──
+const AGENT_QUESTIONS = [
   {
-    key: "transportation",
-    label: "Transportation barriers",
-    assistance: "Cab/public transit voucher referral",
-    adjustment: "Telemedicine or targeted visit schedule",
+    qNum: 1, total: 4,
+    intro: "Thank you for completing your intake form. Based on your information, I have a few follow-up questions to personalize your care plan.",
+    question: "You mentioned experiencing high blood pressure. How would you describe your blood pressure management currently?",
+    type: "buttons",
+    formTitle: "Blood Pressure Management",
+    formHelp: "Select the option that best describes your current situation.",
+    options: [
+      "Well-controlled with medication",
+      "Monitoring at home without medication",
+      "Not currently monitoring",
+      "Recently diagnosed, unsure how to manage",
+    ],
   },
   {
-    key: "childcare",
-    label: "Childcare responsibilities",
-    assistance: "Childcare agency and community center referral",
-    adjustment: "Targeted visit schedule with late-day slots",
+    qNum: 2, total: 4,
+    intro: "Thank you.",
+    question: "You indicated that you have limited transportation access. Could you elaborate on what kind of challenges you face, such as transportation, work schedule, or childcare responsibilities?",
+    type: "checkboxes",
+    formTitle: "Appointment Challenges",
+    formHelp: "Please tell us what makes it difficult to keep your healthcare appointments.",
+    label: "What challenges prevent you from keeping healthcare appointments?",
+    options: [
+      "Transportation issues",
+      "Work schedule conflicts",
+      "Childcare responsibilities",
+      "Cost of appointments or medication",
+      "Lack of time",
+      "Feeling too unwell to attend",
+      "Other",
+    ],
   },
   {
-    key: "food_insecurity",
-    label: "Food insecurity",
-    assistance: "WIC/SNAP linkage and local food pantry referral",
-    adjustment: "Nutrition consultation and weight-gain follow-up",
+    qNum: 3, total: 4,
+    intro: "Got it, thank you for sharing that.",
+    question: "Given your situation, would you prefer a mix of in-person and telemedicine visits? This can help reduce transportation burden while ensuring you receive necessary in-person care.",
+    type: "buttons",
+    formTitle: "Visit Modality Preference",
+    formHelp: "Choose your preferred appointment style.",
+    options: [
+      "Mix of in-person and telemedicine",
+      "Mostly in-person visits",
+      "Mostly telemedicine visits",
+      "No preference",
+    ],
   },
   {
-    key: "none",
-    label: "No unmet social needs identified",
-    assistance: "None",
-    adjustment: "Standard support",
-  },
-];
-
-const VISIT_TEMPLATE = [
-  {
-    visit: "V1",
-    week: "Week 8",
-    defaultModality: "In-person",
-    requiresInPerson: true,
-    tests: "Intake, baseline assessments, and care kickoff",
-  },
-  {
-    visit: "V2",
-    week: "Week 12",
-    defaultModality: "In-person",
-    requiresInPerson: true,
-    tests: "Routine check-in, screening discussion, and psychosocial follow-up",
-  },
-  {
-    visit: "V3",
-    week: "Week 16",
-    defaultModality: "Telemedicine",
-    requiresInPerson: false,
-    tests: "Education, warning-sign review, and social-resource follow-up",
-  },
-  {
-    visit: "V4",
-    week: "Week 20",
-    defaultModality: "In-person",
-    requiresInPerson: true,
-    tests: "Mid-pregnancy imaging and growth review",
-  },
-  {
-    visit: "V5",
-    week: "Week 24",
-    defaultModality: "In-person",
-    requiresInPerson: true,
-    tests: "Routine testing window and blood pressure review",
-  },
-  {
-    visit: "V6",
-    week: "Week 28",
-    defaultModality: "Telemedicine",
-    requiresInPerson: false,
-    tests: "Results review, symptom education, and postpartum planning start",
-  },
-  {
-    visit: "V7",
-    week: "Week 32",
-    defaultModality: "In-person",
-    requiresInPerson: true,
-    tests: "Third-trimester preventive care and trend monitoring",
-  },
-  {
-    visit: "V8",
-    week: "Week 36",
-    defaultModality: "In-person",
-    requiresInPerson: true,
-    tests: "Late-pregnancy screening, delivery planning, and labor-sign counseling",
-  },
-  {
-    visit: "V9",
-    week: "Week 39",
-    defaultModality: "In-person",
-    requiresInPerson: true,
-    tests: "Delivery readiness and postpartum care coordination",
+    qNum: 4, total: 4,
+    intro: "Great choice.",
+    question: "How comfortable are you with monitoring your blood pressure at home and sharing readings with your care team between visits?",
+    type: "slider",
+    formTitle: "Home Monitoring Comfort",
+    formHelp: "Rate your comfort level from 1 (not comfortable) to 5 (very comfortable).",
+    sliderMin: 1, sliderMax: 5,
+    sliderLabels: ["Not comfortable", "Very comfortable"],
   },
 ];
 
-const TRANSCRIPT_SEGMENTS = [
+// ── Phase Definitions ──
+const PHASES = [
   {
-    speaker: "Patient",
-    text: "My bus was late twice this month, so remote visits help when in-person services are not needed.",
+    id: "phase-intake",
+    label: "Phase 1 of 4: Intake Form",
+    title: "Standard Patient Intake",
+    text: "The patient completes a standard intake form with personal details, medical history, allergies, and social determinants of health. Data is imported from EHR where available. This follows the ACOG intake process for initial history and risk assessment.",
   },
   {
-    speaker: "Clinician",
-    text: "We will keep key in-person milestones and convert counseling-heavy check-ins to telemedicine.",
+    id: "phase-questions",
+    label: "Phase 2 of 4: PATHFinder Questions",
+    title: "PATHFinder Agent Follow-up Questions",
+    text: "PATHFinder asks additional personalized questions based on intake data. Instead of free-text input, the agent provides dynamic interaction affordances \u2014 buttons, multiple-choice checkboxes, sliders \u2014 making it easier for patients to respond accurately and quickly.",
   },
   {
-    speaker: "Patient",
-    text: "I also need late afternoon appointments because I do not have daytime childcare.",
+    id: "phase-report",
+    label: "Phase 3 of 4: Patient Report",
+    title: "Draft Report & Care Timeline",
+    text: "PATHFinder generates a personalized prenatal care report and timeline based on ACOG guidelines for greater-than-average-risk patients (chronic hypertension). The patient can review the report, timeline, and ask clarifying questions through the chat panel.",
   },
   {
-    speaker: "Clinician",
-    text: "I am adding childcare referral plus late-day scheduling flags and nutrition follow-up next visit.",
+    id: "phase-clinician",
+    label: "Phase 4 of 4: Clinician Review",
+    title: "Clinician Review & Editing",
+    text: "The clinician receives the AI-generated patient summary, full report, and care timeline. They can review, edit the report, modify the timeline, search medical evidence, and flag concerns through the chat interface. All actions are logged.",
   },
 ];
 
+// ── Autoplay: flat list of all sub-steps across all phases ──
+// Each entry: { phase, action, prompt }
+// Steps that start a new phase get a longer delay; in-phase transitions are shorter.
+const AUTOPLAY_STEPS = [
+  // Phase 0 (Intake): cycle tabs
+  { phase: 0, action: { type: "intake-tab", tab: "personal" },
+    prompt: "Patient enters personal information: name, date of birth, gender, and pronouns." },
+  { phase: 0, action: { type: "intake-tab", tab: "health" },
+    prompt: "Health history section: LMP date, previous conditions, surgeries, and current symptoms like high blood pressure." },
+  { phase: 0, action: { type: "intake-tab", tab: "allergies" },
+    prompt: "Allergies section: known drug and environmental allergies are recorded." },
+  { phase: 0, action: { type: "intake-tab", tab: "social" },
+    prompt: "Social determinants of health: housing, transportation access, employment, food security, and support system." },
+  { phase: 0, action: { type: "intake-tab", tab: "ehr" },
+    prompt: "EHR data imported automatically: MRN, insurance (Medicaid), primary provider, and obstetric history (G1P0)." },
+  // Phase 1 (Questions): show each question
+  { phase: 1, action: { type: "question", idx: 0 },
+    prompt: "PATHFinder asks about blood pressure management using interactive buttons \u2014 no free-text needed." },
+  { phase: 1, action: { type: "question", idx: 1 },
+    prompt: "Appointment challenges: patient selects barriers (transportation, work, childcare) via checkboxes." },
+  { phase: 1, action: { type: "question", idx: 2 },
+    prompt: "Visit modality preference: patient chooses between in-person, telemedicine, or a mix using buttons." },
+  { phase: 1, action: { type: "question", idx: 3 },
+    prompt: "Home monitoring comfort: patient rates willingness to track BP at home using a slider (1\u20135)." },
+  // Phase 2 (Report)
+  { phase: 2, action: { type: "show" },
+    prompt: "PATHFinder generates a personalized 13-visit ACOG care plan, timeline, and a chat window for patient questions." },
+  // Phase 3 (Clinician)
+  { phase: 3, action: { type: "show" },
+    prompt: "Clinician receives AI summary, full report PDF, care timeline, and a chat interface to edit, flag concerns, or search evidence." },
+];
+
+// ── State ──
 const state = {
-  currentStep: 0,
-  activePage: "demoPage",
-  activeTab: "careTab",
-  theme: "light",
-  lmpDate: "",
-  careModelChoice: "",
-  socialNeedKeys: [],
-  takeoverActive: false,
-  clinicianChanges: [],
-  transcriptCount: 0,
+  currentPhase: 0,
+  autoplayIdx: 0,
+  autoplayTimer: null,
+  questionAnswers: {},
 };
 
-const THEME_STORAGE_KEY = "pathfinder-theme";
-const MOBILE_NAV_BREAKPOINT = 900;
-
-const pageTabButtons = Array.from(document.querySelectorAll(".page-tab-btn"));
-const pagePanels = Array.from(document.querySelectorAll(".page-panel"));
-const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
-const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
-const topNav = document.getElementById("topNav");
-const brandHomeBtn = document.getElementById("brandHomeBtn");
-const themeToggleBtn = document.getElementById("themeToggleBtn");
-const themeToggleIcon = document.getElementById("themeToggleIcon");
-const themeToggleLabel = document.getElementById("themeToggleLabel");
-const mobileMenuBtn = document.getElementById("mobileMenuBtn");
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+// ── DOM Helpers ──
+function $(id) { return document.getElementById(id); }
+function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
+function escHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function setActiveTab(tabId) {
-  state.activeTab = tabId;
-  tabButtons.forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.tabTarget === tabId);
-  });
-  tabPanels.forEach((panel) => {
-    panel.classList.toggle("active", panel.id === tabId);
-  });
+// ── Theme Toggle (Light / Dark / System) ──
+const THEME_CYCLE = ["light", "dark", "system"];
+const THEME_ICONS = { light: "\u2600", dark: "\uD83C\uDF19", system: "\uD83D\uDDA5" };
+const THEME_LABELS = { light: "Light", dark: "Dark", system: "System" };
+
+function getStoredTheme() {
+  try { return localStorage.getItem("pf-theme") || "light"; } catch { return "light"; }
+}
+function setStoredTheme(t) {
+  try { localStorage.setItem("pf-theme", t); } catch {}
 }
 
-function setActivePage(pageId) {
-  state.activePage = pageId;
-  pageTabButtons.forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.pageTarget === pageId);
-  });
-  pagePanels.forEach((panel) => {
-    panel.classList.toggle("active", panel.id === pageId);
-  });
-  setMobileMenuOpen(false);
-}
-
-function getSystemTheme() {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-function updateThemeToggleUi(theme) {
-  if (!themeToggleBtn || !themeToggleIcon || !themeToggleLabel) return;
-  themeToggleIcon.textContent = theme === "dark" ? "☾" : "☀";
-  themeToggleLabel.textContent = theme === "dark" ? "Dark" : "Light";
-  themeToggleBtn.setAttribute(
-    "aria-label",
-    theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
-  );
-}
-
-function applyTheme(theme, persist = true) {
-  const normalizedTheme = theme === "dark" ? "dark" : "light";
-  state.theme = normalizedTheme;
-  document.documentElement.setAttribute("data-theme", normalizedTheme);
-  updateThemeToggleUi(normalizedTheme);
-
-  if (!persist) return;
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, normalizedTheme);
-  } catch (_err) {
-    // Ignore storage failures and continue with in-memory theme.
+function applyTheme(pref) {
+  const root = document.documentElement;
+  if (pref === "system") {
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    root.setAttribute("data-theme", prefersDark ? "dark" : "light");
+  } else {
+    root.setAttribute("data-theme", pref);
   }
+  $("themeToggleIcon").textContent = THEME_ICONS[pref];
+  $("themeToggleLabel").textContent = THEME_LABELS[pref];
 }
 
 function initTheme() {
-  let savedTheme = "";
-  try {
-    savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || "";
-  } catch (_err) {
-    savedTheme = "";
-  }
+  const stored = getStoredTheme();
+  applyTheme(stored);
 
-  const initialTheme = savedTheme === "dark" || savedTheme === "light"
-    ? savedTheme
-    : getSystemTheme();
+  $("themeToggleBtn").addEventListener("click", () => {
+    const current = getStoredTheme();
+    const idx = THEME_CYCLE.indexOf(current);
+    const next = THEME_CYCLE[(idx + 1) % THEME_CYCLE.length];
+    setStoredTheme(next);
+    applyTheme(next);
+  });
 
-  applyTheme(initialTheme, false);
-}
-
-function toggleTheme() {
-  applyTheme(state.theme === "dark" ? "light" : "dark", true);
-}
-
-function setMobileMenuOpen(isOpen) {
-  if (!topNav || !mobileMenuBtn) return;
-  topNav.classList.toggle("menu-open", isOpen);
-  mobileMenuBtn.setAttribute("aria-expanded", String(isOpen));
-  mobileMenuBtn.setAttribute(
-    "aria-label",
-    isOpen ? "Close navigation menu" : "Open navigation menu"
-  );
-}
-
-function computeEddIso(lmpIso) {
-  if (!lmpIso) return "";
-  const parts = lmpIso.split("-").map((part) => Number(part));
-  if (parts.length !== 3 || parts.some((part) => Number.isNaN(part))) return "";
-
-  const dt = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
-  dt.setUTCDate(dt.getUTCDate() + 280);
-  return dt.toISOString().slice(0, 10);
-}
-
-function normalizeSocialNeedKeys(keys) {
-  const allowed = new Set(SOCIAL_NEED_OPTIONS.map((option) => option.key));
-  const deduped = Array.from(new Set(keys.filter((key) => allowed.has(key))));
-  if (deduped.includes("none")) return ["none"];
-  return deduped;
-}
-
-function getSocialNeedOption(key) {
-  return SOCIAL_NEED_OPTIONS.find((option) => option.key === key);
-}
-
-function getSocialNeedLabels(keys) {
-  if (keys.length === 0) return ["Not captured"];
-  return keys
-    .map((key) => getSocialNeedOption(key))
-    .filter((option) => Boolean(option))
-    .map((option) => option.label);
-}
-
-function getResourceLines(keys) {
-  if (keys.length === 0) return ["Social resource plan pending intake form submission."];
-  if (keys.includes("none")) return ["No targeted social referrals needed from intake screening."];
-
-  return keys
-    .map((key) => getSocialNeedOption(key))
-    .filter((option) => Boolean(option))
-    .map(
-      (option) =>
-        `${option.label}: assistance -> ${option.assistance}; care adjustment -> ${option.adjustment}`
-    );
-}
-
-function buildVisitPlan(careModelChoice, socialNeedKeys) {
-  return VISIT_TEMPLATE.map((row) => {
-    let modality = row.defaultModality;
-
-    if (careModelChoice === CARE_MODEL_OPTIONS[1] && !row.requiresInPerson) {
-      modality = "In-person";
-    }
-
-    if (careModelChoice === CARE_MODEL_OPTIONS[2] && !row.requiresInPerson) {
-      modality = "Telemedicine";
-    }
-
-    let tests = row.tests;
-    if (socialNeedKeys.includes("transportation") && modality === "Telemedicine") {
-      tests += " + transportation-sensitive virtual slot";
-    }
-    if (socialNeedKeys.includes("childcare") && modality === "In-person") {
-      tests += " + late afternoon scheduling preference";
-    }
-    if (socialNeedKeys.includes("food_insecurity") && row.week === "Week 16") {
-      tests += " + WIC/SNAP onboarding";
-    }
-
-    return {
-      visit: row.visit,
-      week: row.week,
-      modality,
-      tests,
-    };
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (getStoredTheme() === "system") applyTheme("system");
   });
 }
 
-function getDerivedState(step) {
-  const lmpDate = state.lmpDate || (step >= 1 ? "2025-06-02" : "");
-  const eddDate = computeEddIso(lmpDate);
-  const careModelChoice =
-    state.careModelChoice || (step >= 3 ? CARE_MODEL_OPTIONS[0] : "");
-  const socialNeedKeys =
-    state.socialNeedKeys.length > 0
-      ? normalizeSocialNeedKeys(state.socialNeedKeys)
-      : step >= 3
-      ? ["transportation", "childcare", "food_insecurity"]
-      : [];
-
-  const socialNeedLabels = getSocialNeedLabels(socialNeedKeys);
-  const resourceLines = getResourceLines(socialNeedKeys);
-  const tailoredVisits = buildVisitPlan(careModelChoice, socialNeedKeys);
-
-  const statusItems = [
-    {
-      label: "Pre-filled intake fields loaded (demographics, history, medications, allergies)",
-      complete: true,
-    },
-    { label: "LMP captured and EDD computed", complete: step >= 1 },
-    { label: "Social drivers + care model requested in chat", complete: step >= 2 },
-    { label: "Gemini structured form submitted", complete: step >= 3 },
-    { label: "Tailored care plan generated (Week 8-39)", complete: step >= 4 },
-    { label: "Social support referrals generated", complete: step >= 4 },
-    { label: "Clinician handoff completed", complete: step >= 6 },
-  ];
-
-  const oversightNotes = [
-    "High-level only: intake profile synchronized.",
-    step >= 1
-      ? `High-level only: LMP/EDD available (${lmpDate} -> ${eddDate}).`
-      : "Pending: LMP/EDD confirmation.",
-    step >= 3
-      ? `High-level only: social needs flagged -> ${socialNeedLabels.join(", ")}.`
-      : "Pending: social needs screen.",
-    step >= 4
-      ? "High-level only: targeted plan and referrals generated."
-      : "Pending: plan and social referral generation.",
-    state.takeoverActive
-      ? "Nurse takeover currently active."
-      : "Nurse takeover currently inactive.",
-  ];
-
-  const careMessages = [];
-  if (step >= 2) {
-    careMessages.push({
-      role: "assistant",
-      author: "Care Assistant (MedGemma)",
-      text:
-        "Thanks for confirming LMP. Next, please select your preferred care model and any unmet social needs so I can tailor your prenatal schedule.",
+// ── Page Tabs (Demo / About) ──
+function initPageTabs() {
+  $$(".page-tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      $$(".page-tab-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      $$(".page-panel").forEach((p) => p.classList.remove("active"));
+      const target = $(btn.dataset.pageTarget);
+      if (target) target.classList.add("active");
     });
-
-    careMessages.push({
-      role: "assistant",
-      author: "UI Generator (Gemini)",
-      text:
-        "I rendered an in-chat structured form for care model and social drivers of health. Your selections will be converted into scheduling and referral actions.",
-      hasEmbeddedForm: true,
-    });
-  }
-
-  if (step >= 3) {
-    careMessages.push({
-      role: "patient",
-      author: "Danielle Carter",
-      text: `Submitted tailored-care form -> Model: ${careModelChoice}. Social needs: ${socialNeedLabels.join(
-        ", "
-      )}.`,
-    });
-  }
-
-  if (step >= 4) {
-    careMessages.push({
-      role: "assistant",
-      author: "Care Planner (MedGemma)",
-      text:
-        "Tailored plan generated with guideline-aligned milestones, social support referrals, and modality adjustments.",
-    });
-  }
-
-  const clinicianSummary =
-    step >= 6
-      ? `Clinician view of MedGemma report:\n- LMP: ${lmpDate}\n- EDD: ${eddDate}\n- Risk context: chronic hypertension on aspirin 81 mg\n- Care model: ${careModelChoice}\n- Social needs: ${socialNeedLabels.join(", ")}\n- Milestones: baseline assessment, mid-pregnancy imaging, late-pregnancy screening, delivery-readiness review\n- Social plan: ${resourceLines.join(" | ")}`
-      : "Clinician handoff pending.";
-
-  return {
-    lmpDate,
-    eddDate,
-    careModelChoice,
-    socialNeedKeys,
-    socialNeedLabels,
-    resourceLines,
-    tailoredVisits,
-    statusItems,
-    oversightNotes,
-    careMessages,
-    clinicianSummary,
-    planReady: step >= 4,
-    tailoringFormEnabled: step >= 2,
-    tailoringFormSubmitted: step >= 3,
-    oversightReady: step >= 5,
-    clinicianReady: step >= 6,
-    transcriptionReady: step >= 7,
-    commentaryContext: {
-      lmpDate: lmpDate || "Not captured",
-      eddDate: eddDate || "Not captured",
-      careModel: careModelChoice || "Not captured",
-      socialNeeds: socialNeedLabels.join(", "),
-      careFormSource:
-        "",
-    },
-  };
-}
-
-function renderCommentary(step, derived) {
-  const def = STEP_DEFS[step];
-  document.getElementById("stepLabel").textContent = `Step ${step + 1} of ${STEP_DEFS.length}`;
-  document.getElementById("commentaryTitle").textContent = def.title;
-
-  const commentaryText =
-    `${def.text} Current capture -> LMP: ${derived.commentaryContext.lmpDate}; ` +
-    `EDD: ${derived.commentaryContext.eddDate}; ` +
-    `Care model: ${derived.commentaryContext.careModel}; ` +
-    `Social needs: ${derived.commentaryContext.socialNeeds}.`;
-
-  document.getElementById("commentaryText").textContent = commentaryText;
-  document.getElementById("commentaryBullets").innerHTML = [
-    ...def.bullets,
-    ...derived.resourceLines,
-  ]
-    .map((item) => `<li>${escapeHtml(item)}</li>`)
-    .join("");
-
-  document.getElementById("prevStepBtn").disabled = step === 0;
-  document.getElementById("nextStepBtn").disabled = step === STEP_DEFS.length - 1;
-}
-
-function renderHighlights(step) {
-  document.querySelectorAll(".highlight").forEach((el) => el.classList.remove("highlight"));
-  STEP_DEFS[step].highlights.forEach((id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.classList.add("highlight");
-    }
   });
 }
 
-function renderEmbeddedTailoredForm(derived) {
-  const formLocked = Boolean(derived.tailoringFormSubmitted);
+// ── Step Progress Bar ──
+function updateStepBar() {
+  $$(".step-dot").forEach((dot, i) => {
+    dot.classList.remove("active", "completed");
+    if (i < state.currentPhase) dot.classList.add("completed");
+    else if (i === state.currentPhase) dot.classList.add("active");
+  });
+  $$(".step-connector").forEach((conn, i) => {
+    conn.classList.toggle("done", i < state.currentPhase);
+  });
+}
 
-  const careModelMarkup = CARE_MODEL_OPTIONS.map((option) => `
-      <label class="radio-card embedded-option">
-        <input
-          type="radio"
-          name="careModelChoice"
-          value="${escapeHtml(option)}"
-          ${derived.careModelChoice === option ? "checked" : ""}
-          ${!derived.tailoringFormEnabled || formLocked ? "disabled" : ""}
-        />
-        <span>${escapeHtml(option)}</span>
-      </label>
-  `).join("");
+// ── Show Phase ──
+function showPhase(idx) {
+  state.currentPhase = idx;
+  // Only toggle the phase content panels, not the page-level panels
+  $$(".phase-content").forEach((p) => p.classList.remove("active"));
+  $(PHASES[idx].id).classList.add("active");
+  $("phaseLabel").textContent = PHASES[idx].label;
+  $("commentaryTitle").textContent = PHASES[idx].title;
+  $("commentaryText").textContent = PHASES[idx].text;
+  $("prevBtn").disabled = idx === 0;
+  $("nextBtn").disabled = idx === PHASES.length - 1;
+  updateStepBar();
 
-  const socialNeedMarkup = SOCIAL_NEED_OPTIONS.map((option) => `
-      <label class="radio-card embedded-option">
-        <input
-          type="checkbox"
-          name="socialNeedKey"
-          value="${escapeHtml(option.key)}"
-          ${derived.socialNeedKeys.includes(option.key) ? "checked" : ""}
-          ${!derived.tailoringFormEnabled || formLocked ? "disabled" : ""}
-        />
-        <span>${escapeHtml(option.label)}</span>
-      </label>
-  `).join("");
+  if (idx === 0) renderIntakeTab("personal");
+  if (idx === 1) renderQuestion(0);
+  if (idx === 2) renderPatientReport();
+  if (idx === 3) renderClinicianView();
+}
 
-  return `
-    <div class="llm-form-shell" id="llmTailoredForm">
-      <div class="llm-form-title">LLM-generated tailored care form (Gemini UI)</div>
-      <div class="llm-form-help">
-        Captures a care model plus unmet social needs to drive scheduling and referral logic.
-      </div>
-      ${formLocked ? '<div class="llm-form-help">Response submitted and locked.</div>' : ""}
-      <form id="embeddedTailoredForm" class="embedded-form-grid">
-        <div class="embedded-label">Care delivery model</div>
-        ${careModelMarkup}
-        <div class="embedded-label">Unmet social needs (select all that apply)</div>
-        ${socialNeedMarkup}
-        <div class="form-actions">
-          <button
-            id="embeddedSubmitTailoredBtn"
-            class="btn btn-secondary"
-            type="submit"
-            ${!derived.tailoringFormEnabled || formLocked ? "disabled" : ""}
-          >
-            Submit tailored-care form
-          </button>
+// ── Phase 1: Intake ──
+function renderIntakeTab(tab) {
+  $$(".intake-tab").forEach((t) => t.classList.remove("active-itab"));
+  $$(".intake-content").forEach((c) => c.classList.add("hidden"));
+  const tabBtn = $$(".intake-tab").find((t) => t.dataset.itab === tab);
+  if (tabBtn) tabBtn.classList.add("active-itab");
+  const content = $("itab-" + tab);
+  if (content) content.classList.remove("hidden");
+  const tabs = ["ehr", "personal", "health", "allergies", "social"];
+  const idx = tabs.indexOf(tab);
+  $("intakeProgressFill").style.width = ((idx + 1) / tabs.length * 100) + "%";
+}
+
+// ── Phase 2: Questions ──
+function renderQuestion(qIdx) {
+  if (qIdx >= AGENT_QUESTIONS.length) return;
+  const q = AGENT_QUESTIONS[qIdx];
+  const pct = Math.round((qIdx / q.total) * 100);
+
+  $("questionProgress").innerHTML = `
+    <span>Question ${q.qNum} of ${q.total}</span>
+    <div class="q-progress-bar"><div class="q-progress-fill" style="width:${pct}%"></div></div>
+    <span>${pct}%</span>
+  `;
+
+  let formHtml = "";
+  if (q.type === "buttons") {
+    formHtml = `
+      <div class="q-form-shell">
+        <div class="q-form-title">${escHtml(q.formTitle)}</div>
+        <div class="q-form-help">${escHtml(q.formHelp)}</div>
+        <div class="q-btn-grid">
+          ${q.options.map((opt) => `<button class="q-option-btn" data-val="${escHtml(opt)}">${escHtml(opt)}</button>`).join("")}
         </div>
-      </form>
+      </div>`;
+  } else if (q.type === "checkboxes") {
+    formHtml = `
+      <div class="q-form-shell">
+        <div class="q-form-title">${escHtml(q.formTitle)}</div>
+        <div class="q-form-help">${escHtml(q.formHelp)}</div>
+        <div style="margin-bottom:0.2rem;font-size:0.82rem;">${escHtml(q.label)} <span class="q-form-required">*</span></div>
+        ${q.options.map((opt) => `<label class="q-check-row"><input type="checkbox" value="${escHtml(opt)}" />${escHtml(opt)}</label>`).join("")}
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">Select all that apply.</div>
+        <div style="margin-top:0.4rem;"><button class="btn btn-primary">Submit answers</button></div>
+      </div>`;
+  } else if (q.type === "slider") {
+    formHtml = `
+      <div class="q-form-shell">
+        <div class="q-form-title">${escHtml(q.formTitle)}</div>
+        <div class="q-form-help">${escHtml(q.formHelp)}</div>
+        <div class="q-slider-row">
+          <span style="font-size:0.75rem;">${escHtml(q.sliderLabels[0])}</span>
+          <input type="range" min="${q.sliderMin}" max="${q.sliderMax}" value="3" />
+          <span style="font-size:0.75rem;">${escHtml(q.sliderLabels[1])}</span>
+        </div>
+        <div style="margin-top:0.4rem;"><button class="btn btn-primary">Submit</button></div>
+      </div>`;
+  }
+
+  $("questionArea").innerHTML = `
+    <div class="q-message assistant">
+      <span class="q-meta">Assistant</span>
+      ${escHtml(q.intro)}<br/>
+      <span class="q-bold">Question ${q.qNum} of ${q.total}:</span> ${escHtml(q.question)}
+      ${formHtml}
     </div>
+  `;
+
+  $("questionArea").querySelectorAll(".q-option-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      $("questionArea").querySelectorAll(".q-option-btn").forEach((b) => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      state.questionAnswers[q.qNum] = btn.dataset.val;
+    });
+  });
+}
+
+// ── Phase 3: Patient Report ──
+function renderPatientReport() {
+  const modalityClass = (m) => {
+    if (m === "In-Person") return "modality-ip";
+    if (m === "Telemedicine") return "modality-tele";
+    if (m === "Imaging") return "modality-us";
+    return "";
+  };
+
+  $("reportContent").innerHTML = `
+    <div class="report-section">
+      <h4>Prenatal Care Visit Schedule</h4>
+      <p>Personalized plan for ${PATIENT.firstName} ${PATIENT.lastName} \u2014 Greater Than Average Risk (Chronic Hypertension)</p>
+      <p style="font-size:0.76rem;color:var(--muted);">Based on ACOG Clinical Consensus No. 8, Appendix 1</p>
+      <table class="report-table">
+        <thead><tr><th>Weeks Gestation</th><th>Visit Type</th><th>Modality</th><th>Key Activities &amp; Discussion Topics</th></tr></thead>
+        <tbody>
+          ${VISIT_SCHEDULE.map((v) => `
+            <tr>
+              <td><strong>${v.week} weeks</strong></td>
+              <td>${escHtml(v.visit)}</td>
+              <td><span class="${modalityClass(v.modality)}">${escHtml(v.modality)}</span></td>
+              <td>${escHtml(v.actions)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+    <div class="report-section">
+      <h4>Psychosocial Screening (All Trimesters)</h4>
+      <ul>
+        <li>Mental health conditions screening</li>
+        <li>Substance use/abuse screening</li>
+        <li>Intimate partner violence (IPV) / Trauma screening</li>
+        <li>Social drivers of health (1st trimester)</li>
+      </ul>
+    </div>
+    <div class="report-section">
+      <h4>Immunizations (3rd Trimester)</h4>
+      <ul><li>Tdap vaccination</li><li>Rh(D) Immunoglobulin (if Rh-negative and indicated)</li><li>RSV vaccine (seasonal)</li></ul>
+    </div>
+  `;
+
+  const timelineWeeks = [
+    { range: "Week 6-8", items: [
+      "Complete initial prenatal labs and physical exam.",
+      "Discuss aneuploidy screening options (e.g., cell-free DNA).",
+      '<span class="tl-highlight">Begin home blood pressure monitoring 1-2 times daily.</span>',
+      "Discuss starting daily low-dose aspirin (81 mg) with your clinician to reduce preeclampsia risk.",
+    ]},
+    { range: "Week 12-16", items: [
+      "Attend telemedicine or in-person visit to review initial labs and discuss genetic screening options.",
+      '<span class="tl-highlight">Start taking a daily prenatal vitamin with at least 400 mcg of folic acid.</span>',
+      "Check-in on symptoms, review home blood pressure log, discuss nutrition and weight gain.",
+    ]},
+    { range: "Week 18-22", items: [
+      "Schedule and attend the in-person anatomy ultrasound to check the baby's development.",
+      "Have a telemedicine visit to review ultrasound results and discuss fetal movement.",
+      "Focus on a low-sodium diet to help manage blood pressure.",
+    ]},
+    { range: "Week 24-28", items: [
+      "Physical exam, measure fundal height, listen to fetal heart tones.",
+      "Discuss signs of preterm labor and select a newborn care clinician.",
+      '<span class="tl-highlight">Glucose screening for gestational diabetes (GTT).</span>',
+      "Tdap vaccination, Rh(D) immunoglobulin if needed.",
+      "Continue monitoring blood pressure at home and maintain a log for review.",
+    ]},
+    { range: "Week 30-34", items: [
+      "Review lab results, discuss birth preferences and planning, infant feeding education.",
+      "Physical exam, check fetal presentation, discuss signs of preeclampsia in detail.",
+      "GBS screen (Group B Strep).",
+    ]},
+    { range: "Week 36-38", items: [
+      "Review birth plan, discuss labor signs and preeclampsia warning signs.",
+      "Final assessment, confirm delivery plan.",
+      "FMLA/Disability forms, postpartum depression awareness.",
+      "RSV vaccine (seasonal).",
+    ]},
+  ];
+
+  $("timelineContent").innerHTML = `
+    <h4 style="margin:0 0 0.4rem;color:var(--primary-2);font-size:1rem;">Prenatal Care Timeline</h4>
+    <p style="font-size:0.78rem;color:var(--muted);margin:0 0 0.6rem;">Personalized plan for ${PATIENT.firstName} ${PATIENT.lastName}</p>
+    ${timelineWeeks.map((tw) => `
+      <div class="timeline-block">
+        <h4>${tw.range}</h4>
+        <div class="tl-date">Date range TBD</div>
+        <ul>${tw.items.map((it) => `<li>${it}</li>`).join("")}</ul>
+      </div>
+    `).join("")}
+  `;
+
+  $("patientChatMessages").innerHTML = `
+    <div class="chat-msg system">Select text from report/timeline and ask follow-up questions.</div>
   `;
 }
 
-function renderCare(derived) {
-  document.getElementById("patientFirstNameField").value = PREFILLED_PIPELINE_FIELDS.patient_first_name;
-  document.getElementById("patientLastNameField").value = PREFILLED_PIPELINE_FIELDS.patient_last_name;
-  document.getElementById("patientDobField").value = PREFILLED_PIPELINE_FIELDS.patient_dob;
-  document.getElementById("patientObHistoryField").value = PREFILLED_PIPELINE_FIELDS.patient_ob_history;
-  document.getElementById("patientGenderField").value = PREFILLED_PIPELINE_FIELDS.gender;
-  document.getElementById("prevHealthField").value = PREFILLED_PIPELINE_FIELDS.previous_health_conditions;
-  document.getElementById("currentSymptomsField").value = PREFILLED_PIPELINE_FIELDS.current_health_problems;
-  document.getElementById("currentMedsField").value = PREFILLED_PIPELINE_FIELDS.current_medications;
-  document.getElementById("standardAllergiesField").value = PREFILLED_PIPELINE_FIELDS.standard_allergies;
-  document.getElementById("baselineSocialField").value = PREFILLED_PIPELINE_FIELDS.baseline_social_context;
+// ── Phase 4: Clinician Review ──
+function renderClinicianView() {
+  $("clinicianSummary").innerHTML = `
+    <div class="summary-field"><strong>Clinical Summary: ${PATIENT.firstName} ${PATIENT.lastName} - Initial Prenatal Visit</strong></div>
+    <div class="summary-field"><strong>Patient:</strong> ${PATIENT.firstName} ${PATIENT.lastName}, a 27-year-old female (DOB: ${PATIENT.dob}), presenting for initial prenatal care. This appears to be her first pregnancy (${PATIENT.gravPara}).</div>
+    <div class="summary-field"><strong>LMP:</strong> ${PATIENT.lmp}</div>
+    <div class="summary-field"><strong>EDD:</strong> ${PATIENT.edd}</div>
+    <div class="summary-field"><strong>Gestational Age:</strong> ${PATIENT.gestAge}</div>
+    <div class="summary-field"><strong>Key Health History &amp; Current Concerns:</strong></div>
+    <div class="summary-field"><strong>Chronic Hypertension:</strong> The patient reports a history of high blood pressure. Given the early gestational age, this should be managed as pre-existing chronic hypertension. This significantly increases the risk for maternal and fetal complications, including superimposed preeclampsia, fetal growth restriction (FGR), placental abruption, and preterm birth.</div>
+    <div class="summary-field"><strong>Past Medical/Surgical History:</strong> Otherwise unremarkable, with no other reported conditions or prior hospitalizations.</div>
+    <div class="summary-field"><strong>Social Determinants of Health:</strong></div>
+    <div class="summary-field">Transportation: Limited (relies on public transit) \u2014 consider telemedicine for appropriate visits.</div>
+    <div class="summary-field">Food Security: Occasionally food insecure \u2014 refer to WIC and local food assistance programs.</div>
+    <div class="summary-field">Insurance: Medicaid \u2014 ensure all referrals are in-network.</div>
+    <div class="summary-field"><strong>Risk Classification:</strong> Greater than average risk per ACOG guidelines. Recommend 13-visit schedule with closer monitoring.</div>
+  `;
 
-  document.getElementById("lmpDateInput").value = derived.lmpDate;
-  document.getElementById("confirmLmpBtn").disabled = false;
+  $("ptab-reportPdf").innerHTML = `
+    <div class="pdf-viewer">
+      <div class="pdf-toolbar">
+        <span>\u2630</span>
+        <span>pathfinder_report...</span>
+        <span>7 / 9</span>
+        <span>73%</span>
+      </div>
+      <div class="pdf-page">
+        <p style="font-size:0.75rem;color:#6b7280;margin:0 0 0.3rem;">Since we know getting to the clinic can be difficult...</p>
+        <h4 style="margin:0.3rem 0;">Your Most Important Next Steps</h4>
+        <p style="font-size:0.78rem;">To get started on the right foot, please focus on these three things:</p>
+        <ol style="font-size:0.78rem;line-height:1.5;">
+          <li><strong>Start a Daily Prenatal Vitamin:</strong> If you haven't already, please begin taking a prenatal vitamin with at least 400 mcg of folic acid every day. This is very important for your baby's early development.</li>
+          <li><strong>Monitor Your Blood Pressure at Home:</strong> Please continue checking your blood pressure at home once or twice a day. Keep a simple log of the numbers and bring it with you to every appointment \u2014 even the virtual ones! This is the best way for us to partner with you in managing your health.</li>
+          <li><strong>Talk to Your Doctor About Low-Dose Aspirin:</strong> At your next visit, please discuss starting a daily low-dose (81 mg) aspirin with your clinician. This is a common and safe recommendation for pregnant individuals with high blood pressure to help prevent complications.</li>
+        </ol>
+        <h4 style="margin:0.5rem 0 0.2rem;">What to Watch For</h4>
+        <p style="font-size:0.78rem;">Please don't hesitate to call your doctor's office right away if you experience any of these symptoms:</p>
+        <ul style="font-size:0.78rem;line-height:1.5;">
+          <li>A very bad headache that doesn't go away</li>
+          <li>Changes in your eyesight, like seeing spots or blurry vision</li>
+          <li>Sudden swelling in your hands or face</li>
+          <li>A blood pressure reading higher than 140/90</li>
+        </ul>
+        <h4 style="margin:0.5rem 0 0.2rem;">Help with Transportation</h4>
+        <p style="font-size:0.78rem;">We understand that getting to your appointments can be a challenge. We found a few local resources that may be able to help with rides. We encourage you to contact them to see if you qualify for their services:</p>
+        <ul style="font-size:0.78rem;">
+          <li>NON-EMERGENCY MEDICAL TRANSPORTATION</li>
+          <li>NON-EMERGENCY MEDICAL TRANSPORTATION FOR MEDICAID RECIPIENTS</li>
+          <li>MEDICAL APPOINTMENTS TRANSPORTATION</li>
+        </ul>
+        <p style="font-size:0.78rem;margin-top:0.5rem;">We are so glad to be on this journey with you. Remember, managing your blood pressure is a team effort, and you've already taken a great first step by monitoring it at home. We're here to answer all your questions and make sure you feel confident and cared for.</p>
+        <p style="font-size:0.78rem;font-style:italic;">Warmly,<br/>Your Prenatal Care Team</p>
+      </div>
+    </div>
+  `;
 
-  const careChatBox = document.getElementById("careChatBox");
-  if (derived.careMessages.length === 0) {
-    careChatBox.innerHTML =
-      '<div class="message assistant"><span class="meta">Care Assistant (MedGemma)</span>Waiting for LMP before launching tailored social-needs screening.</div>';
-  } else {
-    careChatBox.innerHTML = derived.careMessages
-      .map(
-        (msg) => `
-          <div class="message ${escapeHtml(msg.role)}">
-            <span class="meta">${escapeHtml(msg.author)}</span>
-            ${escapeHtml(msg.text)}
-            ${msg.hasEmbeddedForm ? renderEmbeddedTailoredForm(derived) : ""}
-          </div>`
-      )
-      .join("");
+  $("ptab-careTimeline").innerHTML = $("timelineContent") ? $("timelineContent").innerHTML : "<p>Timeline will appear after report generation.</p>";
+
+  $("clinicianChatMessages").innerHTML = `
+    <div class="chat-msg system">Use the actions below to modify the report, request timeline changes, or search medical evidence online. All actions are logged for clinician review notes.</div>
+  `;
+}
+
+// ── Intake Tab Switching ──
+function initIntakeTabs() {
+  $$(".intake-tab").forEach((tab) => {
+    tab.addEventListener("click", () => renderIntakeTab(tab.dataset.itab));
+  });
+}
+
+// ── Panel Tab Switching (Clinician Report/Timeline) ──
+function initPanelTabs() {
+  $$(".panel-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      $$(".panel-tab").forEach((t) => t.classList.remove("active-ptab"));
+      tab.classList.add("active-ptab");
+      $$(".ptab-content").forEach((c) => c.classList.add("hidden"));
+      const el = $("ptab-" + tab.dataset.ptab);
+      if (el) el.classList.remove("hidden");
+    });
+  });
+}
+
+// ── Step Dot Navigation ──
+function initStepDots() {
+  $$(".step-dot").forEach((dot) => {
+    dot.addEventListener("click", () => {
+      const idx = parseInt(dot.dataset.step, 10);
+      showPhase(idx);
+      // Sync autoplay index to start of this phase
+      state.autoplayIdx = AUTOPLAY_STEPS.findIndex((s) => s.phase === idx);
+      if (state.autoplayIdx < 0) state.autoplayIdx = 0;
+    });
+  });
+}
+
+// ── Prev/Next Buttons ──
+function initNavButtons() {
+  $("prevBtn").addEventListener("click", () => {
+    if (state.currentPhase > 0) {
+      showPhase(state.currentPhase - 1);
+      state.autoplayIdx = AUTOPLAY_STEPS.findIndex((s) => s.phase === state.currentPhase);
+      if (state.autoplayIdx < 0) state.autoplayIdx = 0;
+    }
+  });
+  $("nextBtn").addEventListener("click", () => {
+    if (state.currentPhase < PHASES.length - 1) {
+      showPhase(state.currentPhase + 1);
+      state.autoplayIdx = AUTOPLAY_STEPS.findIndex((s) => s.phase === state.currentPhase);
+      if (state.autoplayIdx < 0) state.autoplayIdx = 0;
+    }
+  });
+  $("submitIntakeBtn").addEventListener("click", () => {
+    showPhase(1);
+    state.autoplayIdx = AUTOPLAY_STEPS.findIndex((s) => s.phase === 1);
+  });
+}
+
+// ── Autoplay (across ALL phases and sub-steps) ──
+// Phase transitions get the full user-selected delay (longer, so user can read).
+// In-phase sub-step transitions use 40% of that delay (shorter, snappier).
+function getPhaseDelay() {
+  return parseInt($("autoplayDelay").value, 10);
+}
+function getSubStepDelay() {
+  return Math.round(getPhaseDelay() * 0.4);
+}
+
+function scheduleNext() {
+  if (state.autoplayIdx >= AUTOPLAY_STEPS.length) {
+    stopAutoplay();
+    $("autoplayToggle").checked = false;
+    return;
   }
+  // Determine if the NEXT step crosses a phase boundary
+  const nextStep = AUTOPLAY_STEPS[state.autoplayIdx];
+  const isPhaseChange = nextStep.phase !== state.currentPhase;
+  const delay = isPhaseChange ? getPhaseDelay() : getSubStepDelay();
+  state.autoplayTimer = setTimeout(advanceAutoplay, delay);
+}
 
-  const summary = document.getElementById("planSummary");
-  const planCard = document.getElementById("planReportCard");
-  const visitTableBody = document.getElementById("visitTableBody");
-  const timeline = document.getElementById("careTimelineImage");
+function startAutoplay() {
+  stopAutoplay();
+  // Execute the first step immediately, then schedule
+  advanceAutoplay();
+}
 
-  if (!derived.planReady) {
-    summary.textContent =
-      "Plan not generated yet. MedGemma will create a Week 8 to Week 39 tailored report after care-model and social-needs submission.";
-    visitTableBody.innerHTML = "";
-    timeline.style.opacity = "0.2";
-    planCard.style.opacity = "0.7";
+function stopAutoplay() {
+  if (state.autoplayTimer) {
+    clearTimeout(state.autoplayTimer);
+    state.autoplayTimer = null;
+  }
+}
+
+function advanceAutoplay() {
+  state.autoplayTimer = null;
+
+  if (state.autoplayIdx >= AUTOPLAY_STEPS.length) {
+    stopAutoplay();
+    $("autoplayToggle").checked = false;
     return;
   }
 
-  planCard.style.opacity = "1";
-  timeline.style.opacity = "1";
-  summary.textContent =
-    `Generated using LMP ${derived.lmpDate} (EDD ${derived.eddDate}), ` +
-    `care model "${derived.careModelChoice}", and social needs ` +
-    `${derived.socialNeedLabels.join(", ")}. `;
+  const step = AUTOPLAY_STEPS[state.autoplayIdx];
 
-  visitTableBody.innerHTML = derived.tailoredVisits
-    .map(
-      (row) => `
-    <tr>
-      <td>${escapeHtml(row.visit)}</td>
-      <td>${escapeHtml(row.week)}</td>
-      <td>${escapeHtml(row.modality)}</td>
-      <td>${escapeHtml(row.tests)}</td>
-    </tr>
-  `
-    )
-    .join("");
-}
-
-function renderOversight(derived) {
-  const statuses = document.getElementById("oversightStatuses");
-  statuses.innerHTML = derived.statusItems
-    .map(
-      (item) => `
-      <div class="status-item ${item.complete ? "complete" : "pending"}">
-        ${item.complete ? "Complete" : "Pending"}: ${escapeHtml(item.label)}
-      </div>`
-    )
-    .join("");
-
-  const notes = document.getElementById("oversightNotes");
-  notes.innerHTML = derived.oversightNotes
-    .map((note) => `<div class="event-item">${escapeHtml(note)}</div>`)
-    .join("");
-
-  const takeoverBtn = document.getElementById("takeoverBtn");
-  takeoverBtn.disabled = !derived.oversightReady;
-  document.getElementById("takeoverState").textContent = state.takeoverActive
-    ? "Takeover active"
-    : "Takeover inactive";
-}
-
-function renderClinician(derived) {
-  const summary = document.getElementById("clinicianPlanSummary");
-  summary.textContent = derived.clinicianSummary;
-
-  const clinicianTimeline = document.getElementById("clinicianTimelineImage");
-  clinicianTimeline.style.opacity = derived.clinicianReady ? "1" : "0.2";
-
-  const applyAgentBtn = document.getElementById("applyAgentBtn");
-  const simulateTranscriptionBtn = document.getElementById("simulateTranscriptionBtn");
-  applyAgentBtn.disabled = !derived.clinicianReady;
-  simulateTranscriptionBtn.disabled = !derived.transcriptionReady;
-
-  const changesLog = document.getElementById("agentChangesLog");
-  if (!derived.clinicianReady) {
-    changesLog.innerHTML = '<div class="event-item">Clinician handoff pending.</div>';
-  } else if (state.clinicianChanges.length === 0) {
-    changesLog.innerHTML = '<div class="event-item">No clinician modifications applied yet.</div>';
-  } else {
-    changesLog.innerHTML = state.clinicianChanges
-      .map((change) => `<div class="event-item">${escapeHtml(change)}</div>`)
-      .join("");
+  // Switch phase if needed
+  if (step.phase !== state.currentPhase) {
+    showPhase(step.phase);
   }
 
-  const transcriptionLog = document.getElementById("transcriptionLog");
-  if (!derived.transcriptionReady) {
-    transcriptionLog.innerHTML =
-      '<div class="message assistant"><span class="meta">MedASR</span>Transcription feed will start at Step 8.</div>';
-    return;
+  // Execute action within the phase
+  const action = step.action;
+  if (action.type === "intake-tab") {
+    renderIntakeTab(action.tab);
+  } else if (action.type === "question") {
+    renderQuestion(action.idx);
   }
 
-  const activeSegments = TRANSCRIPT_SEGMENTS.slice(0, Math.max(1, state.transcriptCount));
-  transcriptionLog.innerHTML = activeSegments
-    .map(
-      (segment, idx) => `
-        <div class="message clinician">
-          <span class="meta">MedASR Segment ${idx + 1} | ${escapeHtml(segment.speaker)}</span>
-          ${escapeHtml(segment.text)}
-        </div>`
-    )
-    .join("");
-}
-
-function renderAll() {
-  const step = state.currentStep;
-  const derived = getDerivedState(step);
-  const defaultTab = STEP_DEFS[step].tab;
-  setActiveTab(defaultTab);
-  renderCommentary(step, derived);
-  renderCare(derived);
-  renderOversight(derived);
-  renderClinician(derived);
-  renderHighlights(step);
-}
-
-function goToStep(nextStep) {
-  if (nextStep < 0 || nextStep >= STEP_DEFS.length) return;
-
-  if (nextStep < state.currentStep) {
-    if (nextStep < 1) state.lmpDate = "";
-    if (nextStep < 3) {
-      state.careModelChoice = "";
-      state.socialNeedKeys = [];
-    }
-    if (nextStep < 7) state.transcriptCount = 0;
-    if (nextStep < 6) state.clinicianChanges = [];
-    state.takeoverActive = false;
+  // Show the autoplay prompt in the commentary box
+  if (step.prompt) {
+    $("commentaryText").textContent = step.prompt;
   }
 
-  state.currentStep = nextStep;
-  renderAll();
+  state.autoplayIdx++;
+
+  // Schedule the next step
+  if ($("autoplayToggle").checked) {
+    scheduleNext();
+  }
 }
 
-function bindTabs() {
-  tabButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      setActiveTab(btn.dataset.tabTarget);
-    });
+function initAutoplay() {
+  $("autoplayToggle").addEventListener("change", (e) => {
+    if (e.target.checked) startAutoplay();
+    else stopAutoplay();
   });
 }
 
-function bindPageTabs() {
-  pageTabButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      setActivePage(btn.dataset.pageTarget);
-    });
-  });
-}
+// ── Report text selection for patient chat ──
+function initReportTextSelection() {
+  const reportContent = $("reportContent");
+  const timelineContent = $("timelineContent");
+  const chatMessages = $("patientChatMessages");
 
-function bindThemeActions() {
-  if (!themeToggleBtn) return;
-  themeToggleBtn.addEventListener("click", () => {
-    toggleTheme();
-  });
-}
-
-function bindNavActions() {
-  if (brandHomeBtn) {
-    brandHomeBtn.addEventListener("click", (event) => {
-      event.preventDefault();
-      setActivePage("demoPage");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+  function handleSelection(source) {
+    const sel = window.getSelection();
+    const text = sel ? sel.toString().trim() : "";
+    if (text.length > 5 && chatMessages) {
+      const indicator = document.createElement("div");
+      indicator.className = "selected-text-indicator";
+      indicator.innerHTML = `<div class="sti-label">Selected from ${source} pane:</div>"${escHtml(text.substring(0, 120))}${text.length > 120 ? "..." : ""}"`;
+      chatMessages.appendChild(indicator);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
   }
 
-  if (mobileMenuBtn) {
-    mobileMenuBtn.addEventListener("click", () => {
-      const isOpen = topNav ? topNav.classList.contains("menu-open") : false;
-      setMobileMenuOpen(!isOpen);
-    });
-  }
-
-  document.addEventListener("click", (event) => {
-    if (!topNav || !mobileMenuBtn) return;
-    if (!topNav.classList.contains("menu-open")) return;
-    if (!(event.target instanceof Node)) return;
-    if (topNav.contains(event.target)) return;
-    setMobileMenuOpen(false);
-  });
-
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > MOBILE_NAV_BREAKPOINT) {
-      setMobileMenuOpen(false);
-    }
-  });
+  if (reportContent) reportContent.addEventListener("mouseup", () => handleSelection("report"));
+  if (timelineContent) timelineContent.addEventListener("mouseup", () => handleSelection("timeline"));
 }
 
-function bindStepControls() {
-  document.getElementById("prevStepBtn").addEventListener("click", () => {
-    goToStep(state.currentStep - 1);
-  });
-
-  document.getElementById("nextStepBtn").addEventListener("click", () => {
-    goToStep(state.currentStep + 1);
-  });
+// ── Initialize ──
+function init() {
+  initTheme();
+  initPageTabs();
+  initIntakeTabs();
+  initPanelTabs();
+  initStepDots();
+  initNavButtons();
+  initAutoplay();
+  initReportTextSelection();
+  showPhase(0);
 }
 
-function bindCareActions() {
-  document.getElementById("confirmLmpBtn").addEventListener("click", () => {
-    const input = document.getElementById("lmpDateInput");
-    if (!input.value) return;
-
-    state.lmpDate = input.value;
-    if (state.currentStep < 1) {
-      goToStep(1);
-      return;
-    }
-    renderAll();
-  });
-
-  const careChatBox = document.getElementById("careChatBox");
-
-  careChatBox.addEventListener("change", (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLInputElement)) return;
-
-    if (target.name === "careModelChoice") {
-      state.careModelChoice = target.value;
-      return;
-    }
-
-    if (target.name !== "socialNeedKey") return;
-
-    if (target.checked) {
-      if (target.value === "none") {
-        state.socialNeedKeys = ["none"];
-      } else {
-        state.socialNeedKeys = state.socialNeedKeys.filter((key) => key !== "none");
-        if (!state.socialNeedKeys.includes(target.value)) {
-          state.socialNeedKeys.push(target.value);
-        }
-      }
-    } else {
-      state.socialNeedKeys = state.socialNeedKeys.filter((key) => key !== target.value);
-    }
-  });
-
-  careChatBox.addEventListener("submit", (event) => {
-    const form = event.target;
-    if (!(form instanceof HTMLFormElement)) return;
-    if (form.id !== "embeddedTailoredForm") return;
-
-    event.preventDefault();
-
-    const selectedCareModel = form.querySelector('input[name="careModelChoice"]:checked');
-    if (!(selectedCareModel instanceof HTMLInputElement)) return;
-
-    const checkedNeeds = Array.from(
-      form.querySelectorAll('input[name="socialNeedKey"]:checked')
-    )
-      .filter((node) => node instanceof HTMLInputElement)
-      .map((node) => node.value);
-
-    state.careModelChoice = selectedCareModel.value;
-
-    if (checkedNeeds.length === 0) {
-      state.socialNeedKeys = ["none"];
-    } else {
-      state.socialNeedKeys = normalizeSocialNeedKeys(checkedNeeds);
-    }
-
-    if (state.currentStep < 3) {
-      goToStep(3);
-      return;
-    }
-    renderAll();
-  });
-}
-
-function bindOversightActions() {
-  document.getElementById("takeoverBtn").addEventListener("click", () => {
-    if (state.currentStep < 5) return;
-    state.takeoverActive = !state.takeoverActive;
-    renderAll();
-  });
-}
-
-function bindClinicianActions() {
-  document.getElementById("applyAgentBtn").addEventListener("click", () => {
-    if (state.currentStep < 6) return;
-
-    const input = document.getElementById("agentInstructionInput");
-    const text = input.value.trim();
-    if (!text) return;
-
-    const entry = `MedGemma agent applied clinician instruction: ${text}`;
-    state.clinicianChanges.push(entry);
-    input.value = "";
-    renderAll();
-  });
-
-  document.getElementById("simulateTranscriptionBtn").addEventListener("click", () => {
-    if (state.currentStep < 7) return;
-    state.transcriptCount = Math.min(TRANSCRIPT_SEGMENTS.length, state.transcriptCount + 1);
-    if (state.transcriptCount === 0) state.transcriptCount = 1;
-    renderAll();
-  });
-}
-
-initTheme();
-bindPageTabs();
-bindThemeActions();
-bindNavActions();
-bindTabs();
-bindStepControls();
-bindCareActions();
-bindOversightActions();
-bindClinicianActions();
-setActivePage(state.activePage);
-renderAll();
+init();
