@@ -1,6 +1,7 @@
 /* ========================================================
-   PATHFinder Demo – app.js
-   4-phase prenatal care workflow based on ACOG guidelines
+   PATHFinder – app.js
+   Landing page + 4-phase prenatal care demo (ACOG-based)
+   Phases: Intake → Follow-up Questions → Report → Joint Review
    ======================================================== */
 
 // ── Patient Data ──
@@ -103,64 +104,55 @@ const AGENT_QUESTIONS = [
   },
 ];
 
-// ── Phase Definitions ──
+// ── Phase Definitions (4 phases) ──
 const PHASES = [
   {
     id: "phase-intake",
-    label: "Phase 1 of 4: Intake Form",
+    label: "Step 1 of 4: Intake Form",
     title: "Standard Patient Intake",
-    text: "The patient completes a standard intake form with personal details, medical history, allergies, and social determinants of health. Data is imported from EHR where available. This follows the ACOG intake process for initial history and risk assessment.",
+    text: "The patient completes a standard intake form with personal details, medical history, allergies, and social determinants of health. Data is imported from the EHR where available. This follows the ACOG intake process for initial history and risk assessment.",
   },
   {
     id: "phase-questions",
-    label: "Phase 2 of 4: PATHFinder Questions",
+    label: "Step 2 of 4: PATHFinder Questions",
     title: "PATHFinder Agent Follow-up Questions",
-    text: "PATHFinder asks additional personalized questions based on intake data. Instead of free-text input, the agent provides dynamic interaction affordances \u2014 buttons, multiple-choice checkboxes, sliders \u2014 making it easier for patients to respond accurately and quickly.",
+    text: "PATHFinder asks additional personalized questions based on intake data. Instead of free-text input, the agent provides dynamic interaction affordances — buttons, multiple-choice checkboxes, sliders — making it easier for patients to respond accurately and quickly.",
   },
   {
     id: "phase-report",
-    label: "Phase 3 of 4: Patient Report",
-    title: "Draft Report & Care Timeline",
-    text: "PATHFinder generates a personalized prenatal care report and timeline based on ACOG guidelines for greater-than-average-risk patients (chronic hypertension). The patient can review the report, timeline, and ask clarifying questions through the chat panel.",
+    label: "Step 3 of 4: Draft Report Review",
+    title: "Draft Report & Care Plan",
+    text: "PATHFinder generates a personalized prenatal care report based on ACOG guidelines for greater-than-average-risk patients (chronic hypertension). The patient reviews the report and can ask clarifying questions in plain language through the chat panel.",
   },
   {
-    id: "phase-clinician",
-    label: "Phase 4 of 4: Clinician Review",
-    title: "Clinician Review & Editing",
-    text: "The clinician receives the AI-generated patient summary, full report, and care timeline. They can review, edit the report, modify the timeline, search medical evidence, and flag concerns through the chat interface. All actions are logged.",
+    id: "phase-joint",
+    label: "Step 4 of 4: Joint Clinician + Patient Review",
+    title: "Shared Clinician & Patient Review",
+    text: "The clinician and patient review the plan together. In this shared conversation the patient raises a real-life constraint, the clinician proposes a change, and PATHFinder updates the plan live — keeping medically required visits in person while easing access where it is safe to do so.",
   },
 ];
 
-// ── Autoplay: flat list of all sub-steps across all phases ──
-// Each entry: { phase, action, prompt }
-// Steps that start a new phase get a longer delay; in-phase transitions are shorter.
-const AUTOPLAY_STEPS = [
-  // Phase 0 (Intake): cycle tabs
-  { phase: 0, action: { type: "intake-tab", tab: "personal" },
-    prompt: "Patient enters personal information: name, date of birth, gender, and pronouns." },
-  { phase: 0, action: { type: "intake-tab", tab: "health" },
-    prompt: "Health history section: LMP date, previous conditions, surgeries, and current symptoms like high blood pressure." },
-  { phase: 0, action: { type: "intake-tab", tab: "allergies" },
-    prompt: "Allergies section: known drug and environmental allergies are recorded." },
-  { phase: 0, action: { type: "intake-tab", tab: "social" },
-    prompt: "Social determinants of health: housing, transportation access, employment, food security, and support system." },
-  { phase: 0, action: { type: "intake-tab", tab: "ehr" },
-    prompt: "EHR data imported automatically: MRN, insurance (Medicaid), primary provider, and obstetric history (G1P0)." },
-  // Phase 1 (Questions): show each question
-  { phase: 1, action: { type: "question", idx: 0 },
-    prompt: "PATHFinder asks about blood pressure management using interactive buttons \u2014 no free-text needed." },
-  { phase: 1, action: { type: "question", idx: 1 },
-    prompt: "Appointment challenges: patient selects barriers (transportation, work, childcare) via checkboxes." },
-  { phase: 1, action: { type: "question", idx: 2 },
-    prompt: "Visit modality preference: patient chooses between in-person, telemedicine, or a mix using buttons." },
-  { phase: 1, action: { type: "question", idx: 3 },
-    prompt: "Home monitoring comfort: patient rates willingness to track BP at home using a slider (1\u20135)." },
-  // Phase 2 (Report)
-  { phase: 2, action: { type: "show" },
-    prompt: "PATHFinder generates a personalized 13-visit ACOG care plan, timeline, and a chat window for patient questions." },
-  // Phase 3 (Clinician)
-  { phase: 3, action: { type: "show" },
-    prompt: "Clinician receives AI summary, full report PDF, care timeline, and a chat interface to edit, flag concerns, or search evidence." },
+// ── Joint review scripted conversation ──
+const JOINT_SCRIPT = [
+  { role: "agent", name: "PATHFinder",
+    text: "Welcome to your shared review. Dr. Smith and PATHFinder are here with you, V, to finalize your prenatal care plan together." },
+  { role: "clinician", name: "Dr. Smith",
+    text: "Hi V — I've reviewed your draft plan and it's a solid approach for managing your blood pressure during pregnancy. Is there anything about the visit schedule that worries you?" },
+  { role: "patient", name: "V (Patient)",
+    text: "The Week 24 visit is in-person. That's a long bus ride for me and I work part-time, so taking the whole day off is hard. Could that one be virtual?" },
+  { role: "clinician", name: "Dr. Smith",
+    text: "Good point. The Week 24 visit is mostly a blood-pressure and well-being check. If you keep logging your readings at home, we can safely do that one by video. Let's switch it to telemedicine." },
+  { role: "update",
+    week: 24,
+    text: "Week 24 · Visit 5", from: "In-Person", to: "Telemedicine" },
+  { role: "agent", name: "PATHFinder",
+    text: "Done — Week 24 is now a telemedicine visit. I'm keeping the Week 28 visit in person, since it includes the glucose screening lab draw and Tdap vaccination that need to be done on site." },
+  { role: "patient", name: "V (Patient)",
+    text: "That makes sense, thank you! The in-person ones that really need a lab or shot are fine." },
+  { role: "clinician", name: "Dr. Smith",
+    text: "Great. I'll also add a note so the office mails you home blood-pressure cuff instructions before Week 12. Everything else in the plan looks good to me — approved." },
+  { role: "agent", name: "PATHFinder",
+    text: "Plan finalized and shared with both of you. An updated copy has been sent to V's patient portal, and the change is logged in the clinical record." },
 ];
 
 // ── State ──
@@ -169,6 +161,8 @@ const state = {
   autoplayIdx: 0,
   autoplayTimer: null,
   questionAnswers: {},
+  jointTimer: null,
+  jointWk24Updated: false,
 };
 
 // ── DOM Helpers ──
@@ -178,34 +172,27 @@ function escHtml(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-// ── Theme Toggle (Light / Dark / System) ──
-const THEME_CYCLE = ["light", "dark", "system"];
-const THEME_ICONS = { light: "\u2600", dark: "\uD83C\uDF19", system: "\uD83D\uDDA5" };
-const THEME_LABELS = { light: "Light", dark: "Dark", system: "System" };
+// ── Theme Toggle (Light / Sepia / Dark) ──
+const THEME_CYCLE = ["light", "sepia", "dark"];
+const THEME_ICONS = { light: "☀", sepia: "📖", dark: "🌙" };
+const THEME_LABELS = { light: "Light", sepia: "Sepia", dark: "Dark" };
 
 function getStoredTheme() {
-  try { return localStorage.getItem("pf-theme") || "light"; } catch { return "light"; }
+  try { return localStorage.getItem("pf-theme") || "sepia"; } catch { return "sepia"; }
 }
 function setStoredTheme(t) {
   try { localStorage.setItem("pf-theme", t); } catch {}
 }
 
 function applyTheme(pref) {
-  const root = document.documentElement;
-  if (pref === "system") {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    root.setAttribute("data-theme", prefersDark ? "dark" : "light");
-  } else {
-    root.setAttribute("data-theme", pref);
-  }
+  if (!THEME_CYCLE.includes(pref)) pref = "light";
+  document.documentElement.setAttribute("data-theme", pref);
   $("themeToggleIcon").textContent = THEME_ICONS[pref];
   $("themeToggleLabel").textContent = THEME_LABELS[pref];
 }
 
 function initTheme() {
-  const stored = getStoredTheme();
-  applyTheme(stored);
-
+  applyTheme(getStoredTheme());
   $("themeToggleBtn").addEventListener("click", () => {
     const current = getStoredTheme();
     const idx = THEME_CYCLE.indexOf(current);
@@ -213,21 +200,69 @@ function initTheme() {
     setStoredTheme(next);
     applyTheme(next);
   });
+}
 
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-    if (getStoredTheme() === "system") applyTheme("system");
+// ── Lottie hero animation ──
+function initLottie() {
+  if (!window.lottie || !$("lottieHero")) return;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  try {
+    lottie.loadAnimation({
+      container: $("lottieHero"),
+      renderer: "svg",
+      loop: !reduced,
+      autoplay: !reduced,
+      path: "pathfinder_lottie.json",
+    });
+  } catch (e) { /* animation is decorative; ignore load errors */ }
+}
+
+// ── BibTeX copy ──
+function initBibtexCopy() {
+  const btn = $("copyBibtexBtn");
+  const block = $("bibtexBlock");
+  if (!btn || !block) return;
+  btn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(block.textContent);
+      const orig = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => { btn.textContent = orig; }, 1600);
+    } catch {
+      // Fallback: select the text for manual copy
+      const range = document.createRange();
+      range.selectNodeContents(block);
+      const sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+    }
   });
 }
 
-// ── Page Tabs (Demo / About) ──
+// ── Page Tabs (Overview / Demo) ──
+function showPage(targetId) {
+  $$(".page-tab-btn").forEach((b) => {
+    const isTarget = b.dataset.pageTarget === targetId;
+    b.classList.toggle("active", isTarget);
+    if (isTarget) b.setAttribute("aria-current", "page");
+    else b.removeAttribute("aria-current");
+  });
+  $$(".page-panel").forEach((p) => p.classList.toggle("active", p.id === targetId));
+}
+
 function initPageTabs() {
   $$(".page-tab-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      $$(".page-tab-btn").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      $$(".page-panel").forEach((p) => p.classList.remove("active"));
-      const target = $(btn.dataset.pageTarget);
-      if (target) target.classList.add("active");
+    btn.addEventListener("click", () => showPage(btn.dataset.pageTarget));
+  });
+  // "Try the Demo" buttons on the landing page
+  $$("[data-goto-demo]").forEach((btn) => {
+    btn.addEventListener("click", () => showPage("demoPage"));
+  });
+  // Smooth-scroll to citation
+  $$('a[href="#citation"]').forEach((a) => {
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const el = $("citation");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
 }
@@ -237,7 +272,8 @@ function updateStepBar() {
   $$(".step-dot").forEach((dot, i) => {
     dot.classList.remove("active", "completed");
     if (i < state.currentPhase) dot.classList.add("completed");
-    else if (i === state.currentPhase) dot.classList.add("active");
+    else if (i === state.currentPhase) { dot.classList.add("active"); dot.setAttribute("aria-current", "step"); }
+    if (i !== state.currentPhase) dot.removeAttribute("aria-current");
   });
   $$(".step-connector").forEach((conn, i) => {
     conn.classList.toggle("done", i < state.currentPhase);
@@ -246,8 +282,8 @@ function updateStepBar() {
 
 // ── Show Phase ──
 function showPhase(idx) {
+  stopJoint();
   state.currentPhase = idx;
-  // Only toggle the phase content panels, not the page-level panels
   $$(".phase-content").forEach((p) => p.classList.remove("active"));
   $(PHASES[idx].id).classList.add("active");
   $("phaseLabel").textContent = PHASES[idx].label;
@@ -260,7 +296,7 @@ function showPhase(idx) {
   if (idx === 0) renderIntakeTab("personal");
   if (idx === 1) renderQuestion(0);
   if (idx === 2) renderPatientReport();
-  if (idx === 3) renderClinicianView();
+  if (idx === 3) renderJointReview();
 }
 
 // ── Phase 1: Intake ──
@@ -303,9 +339,9 @@ function renderQuestion(qIdx) {
       <div class="q-form-shell">
         <div class="q-form-title">${escHtml(q.formTitle)}</div>
         <div class="q-form-help">${escHtml(q.formHelp)}</div>
-        <div style="margin-bottom:0.2rem;font-size:0.82rem;">${escHtml(q.label)} <span class="q-form-required">*</span></div>
+        <div style="margin-bottom:0.2rem;font-size:0.88rem;">${escHtml(q.label)} <span class="q-form-required">*</span></div>
         ${q.options.map((opt) => `<label class="q-check-row"><input type="checkbox" value="${escHtml(opt)}" />${escHtml(opt)}</label>`).join("")}
-        <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">Select all that apply.</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:0.2rem;">Select all that apply.</div>
         <div style="margin-top:0.4rem;"><button class="btn btn-primary">Submit answers</button></div>
       </div>`;
   } else if (q.type === "slider") {
@@ -314,9 +350,9 @@ function renderQuestion(qIdx) {
         <div class="q-form-title">${escHtml(q.formTitle)}</div>
         <div class="q-form-help">${escHtml(q.formHelp)}</div>
         <div class="q-slider-row">
-          <span style="font-size:0.75rem;">${escHtml(q.sliderLabels[0])}</span>
-          <input type="range" min="${q.sliderMin}" max="${q.sliderMax}" value="3" />
-          <span style="font-size:0.75rem;">${escHtml(q.sliderLabels[1])}</span>
+          <span style="font-size:0.8rem;">${escHtml(q.sliderLabels[0])}</span>
+          <input type="range" min="${q.sliderMin}" max="${q.sliderMax}" value="3" aria-label="${escHtml(q.formTitle)}" />
+          <span style="font-size:0.8rem;">${escHtml(q.sliderLabels[1])}</span>
         </div>
         <div style="margin-top:0.4rem;"><button class="btn btn-primary">Submit</button></div>
       </div>`;
@@ -340,20 +376,20 @@ function renderQuestion(qIdx) {
   });
 }
 
-// ── Phase 3: Patient Report ──
-function renderPatientReport() {
-  const modalityClass = (m) => {
-    if (m === "In-Person") return "modality-ip";
-    if (m === "Telemedicine") return "modality-tele";
-    if (m === "Imaging") return "modality-us";
-    return "";
-  };
+// ── Phase 3: Patient Report (report HTML + ask questions) ──
+function modalityClass(m) {
+  if (m === "In-Person") return "modality-ip";
+  if (m === "Telemedicine") return "modality-tele";
+  if (m === "Imaging") return "modality-us";
+  return "";
+}
 
+function renderPatientReport() {
   $("reportContent").innerHTML = `
     <div class="report-section">
       <h4>Prenatal Care Visit Schedule</h4>
-      <p>Personalized plan for ${PATIENT.firstName} ${PATIENT.lastName} \u2014 Greater Than Average Risk (Chronic Hypertension)</p>
-      <p style="font-size:0.76rem;color:var(--muted);">Based on ACOG Clinical Consensus No. 8, Appendix 1</p>
+      <p>Personalized plan for ${PATIENT.firstName} ${PATIENT.lastName} — Greater Than Average Risk (Chronic Hypertension)</p>
+      <p style="font-size:0.78rem;color:var(--muted);">Based on ACOG Clinical Consensus No. 8, Appendix 1</p>
       <table class="report-table">
         <thead><tr><th>Weeks Gestation</th><th>Visit Type</th><th>Modality</th><th>Key Activities &amp; Discussion Topics</th></tr></thead>
         <tbody>
@@ -367,6 +403,14 @@ function renderPatientReport() {
           `).join("")}
         </tbody>
       </table>
+    </div>
+    <div class="report-section">
+      <h4>Your Most Important Next Steps</h4>
+      <ul>
+        <li>Start a daily prenatal vitamin with at least 400 mcg of folic acid.</li>
+        <li>Monitor your blood pressure at home once or twice a day and keep a log.</li>
+        <li>Talk to your doctor about starting daily low-dose (81 mg) aspirin to help prevent preeclampsia.</li>
+      </ul>
     </div>
     <div class="report-section">
       <h4>Psychosocial Screening (All Trimesters)</h4>
@@ -383,121 +427,89 @@ function renderPatientReport() {
     </div>
   `;
 
-  const timelineWeeks = [
-    { range: "Week 6-8", items: [
-      "Complete initial prenatal labs and physical exam.",
-      "Discuss aneuploidy screening options (e.g., cell-free DNA).",
-      '<span class="tl-highlight">Begin home blood pressure monitoring 1-2 times daily.</span>',
-      "Discuss starting daily low-dose aspirin (81 mg) with your clinician to reduce preeclampsia risk.",
-    ]},
-    { range: "Week 12-16", items: [
-      "Attend telemedicine or in-person visit to review initial labs and discuss genetic screening options.",
-      '<span class="tl-highlight">Start taking a daily prenatal vitamin with at least 400 mcg of folic acid.</span>',
-      "Check-in on symptoms, review home blood pressure log, discuss nutrition and weight gain.",
-    ]},
-    { range: "Week 18-22", items: [
-      "Schedule and attend the in-person anatomy ultrasound to check the baby's development.",
-      "Have a telemedicine visit to review ultrasound results and discuss fetal movement.",
-      "Focus on a low-sodium diet to help manage blood pressure.",
-    ]},
-    { range: "Week 24-28", items: [
-      "Physical exam, measure fundal height, listen to fetal heart tones.",
-      "Discuss signs of preterm labor and select a newborn care clinician.",
-      '<span class="tl-highlight">Glucose screening for gestational diabetes (GTT).</span>',
-      "Tdap vaccination, Rh(D) immunoglobulin if needed.",
-      "Continue monitoring blood pressure at home and maintain a log for review.",
-    ]},
-    { range: "Week 30-34", items: [
-      "Review lab results, discuss birth preferences and planning, infant feeding education.",
-      "Physical exam, check fetal presentation, discuss signs of preeclampsia in detail.",
-      "GBS screen (Group B Strep).",
-    ]},
-    { range: "Week 36-38", items: [
-      "Review birth plan, discuss labor signs and preeclampsia warning signs.",
-      "Final assessment, confirm delivery plan.",
-      "FMLA/Disability forms, postpartum depression awareness.",
-      "RSV vaccine (seasonal).",
-    ]},
-  ];
-
-  $("timelineContent").innerHTML = `
-    <h4 style="margin:0 0 0.4rem;color:var(--primary-2);font-size:1rem;">Prenatal Care Timeline</h4>
-    <p style="font-size:0.78rem;color:var(--muted);margin:0 0 0.6rem;">Personalized plan for ${PATIENT.firstName} ${PATIENT.lastName}</p>
-    ${timelineWeeks.map((tw) => `
-      <div class="timeline-block">
-        <h4>${tw.range}</h4>
-        <div class="tl-date">Date range TBD</div>
-        <ul>${tw.items.map((it) => `<li>${it}</li>`).join("")}</ul>
-      </div>
-    `).join("")}
-  `;
-
   $("patientChatMessages").innerHTML = `
-    <div class="chat-msg system">Select text from report/timeline and ask follow-up questions.</div>
+    <div class="chat-msg system">Select any text in the report and ask a follow-up question, or type below. PATHFinder answers in plain language.</div>
+    <div class="chat-bubble role-patient"><span class="cb-role">You</span>What does "low-dose aspirin" do for me?</div>
+    <div class="chat-bubble role-agent"><span class="cb-role">PATHFinder</span>For people with high blood pressure in pregnancy, a daily baby aspirin (81 mg) lowers the chance of preeclampsia — a serious rise in blood pressure. It's a common, well-studied recommendation. Your clinician will confirm it's right for you at your next visit.</div>
   `;
 }
 
-// ── Phase 4: Clinician Review ──
-function renderClinicianView() {
-  $("clinicianSummary").innerHTML = `
-    <div class="summary-field"><strong>Clinical Summary: ${PATIENT.firstName} ${PATIENT.lastName} - Initial Prenatal Visit</strong></div>
-    <div class="summary-field"><strong>Patient:</strong> ${PATIENT.firstName} ${PATIENT.lastName}, a 27-year-old female (DOB: ${PATIENT.dob}), presenting for initial prenatal care. This appears to be her first pregnancy (${PATIENT.gravPara}).</div>
-    <div class="summary-field"><strong>LMP:</strong> ${PATIENT.lmp}</div>
-    <div class="summary-field"><strong>EDD:</strong> ${PATIENT.edd}</div>
-    <div class="summary-field"><strong>Gestational Age:</strong> ${PATIENT.gestAge}</div>
-    <div class="summary-field"><strong>Key Health History &amp; Current Concerns:</strong></div>
-    <div class="summary-field"><strong>Chronic Hypertension:</strong> The patient reports a history of high blood pressure. Given the early gestational age, this should be managed as pre-existing chronic hypertension. This significantly increases the risk for maternal and fetal complications, including superimposed preeclampsia, fetal growth restriction (FGR), placental abruption, and preterm birth.</div>
-    <div class="summary-field"><strong>Past Medical/Surgical History:</strong> Otherwise unremarkable, with no other reported conditions or prior hospitalizations.</div>
-    <div class="summary-field"><strong>Social Determinants of Health:</strong></div>
-    <div class="summary-field">Transportation: Limited (relies on public transit) \u2014 consider telemedicine for appropriate visits.</div>
-    <div class="summary-field">Food Security: Occasionally food insecure \u2014 refer to WIC and local food assistance programs.</div>
-    <div class="summary-field">Insurance: Medicaid \u2014 ensure all referrals are in-network.</div>
-    <div class="summary-field"><strong>Risk Classification:</strong> Greater than average risk per ACOG guidelines. Recommend 13-visit schedule with closer monitoring.</div>
+// ── Phase 4: Joint Clinician + Patient Review ──
+function renderJointPlan() {
+  const rows = VISIT_SCHEDULE.map((v) => {
+    const updated = state.jointWk24Updated && v.week === 24;
+    const modality = updated ? "Telemedicine" : v.modality;
+    return `
+      <div class="plan-row ${updated ? "pr-updated" : ""}">
+        <span class="pr-week">${v.week} wk</span>
+        <span style="flex:1;">${escHtml(v.visit)} — <span class="${modalityClass(modality)}">${escHtml(modality)}</span>${updated ? ' <strong>(updated)</strong>' : ''}<br/><span style="color:var(--muted);font-size:0.82rem;">${escHtml(v.actions)}</span></span>
+      </div>`;
+  }).join("");
+  $("jointPlan").innerHTML = `
+    <h4 style="margin:0 0 0.4rem;color:var(--primary-2);font-size:1rem;">Care plan for ${PATIENT.firstName} ${PATIENT.lastName}</h4>
+    <p style="font-size:0.8rem;color:var(--muted);margin:0 0 0.6rem;">Greater than average risk · chronic hypertension · ${VISIT_SCHEDULE.length} visits</p>
+    ${rows}
   `;
+}
 
-  $("ptab-reportPdf").innerHTML = `
-    <div class="pdf-viewer">
-      <div class="pdf-toolbar">
-        <span>\u2630</span>
-        <span>pathfinder_report...</span>
-        <span>7 / 9</span>
-        <span>73%</span>
-      </div>
-      <div class="pdf-page">
-        <p style="font-size:0.75rem;color:#6b7280;margin:0 0 0.3rem;">Since we know getting to the clinic can be difficult...</p>
-        <h4 style="margin:0.3rem 0;">Your Most Important Next Steps</h4>
-        <p style="font-size:0.78rem;">To get started on the right foot, please focus on these three things:</p>
-        <ol style="font-size:0.78rem;line-height:1.5;">
-          <li><strong>Start a Daily Prenatal Vitamin:</strong> If you haven't already, please begin taking a prenatal vitamin with at least 400 mcg of folic acid every day. This is very important for your baby's early development.</li>
-          <li><strong>Monitor Your Blood Pressure at Home:</strong> Please continue checking your blood pressure at home once or twice a day. Keep a simple log of the numbers and bring it with you to every appointment \u2014 even the virtual ones! This is the best way for us to partner with you in managing your health.</li>
-          <li><strong>Talk to Your Doctor About Low-Dose Aspirin:</strong> At your next visit, please discuss starting a daily low-dose (81 mg) aspirin with your clinician. This is a common and safe recommendation for pregnant individuals with high blood pressure to help prevent complications.</li>
-        </ol>
-        <h4 style="margin:0.5rem 0 0.2rem;">What to Watch For</h4>
-        <p style="font-size:0.78rem;">Please don't hesitate to call your doctor's office right away if you experience any of these symptoms:</p>
-        <ul style="font-size:0.78rem;line-height:1.5;">
-          <li>A very bad headache that doesn't go away</li>
-          <li>Changes in your eyesight, like seeing spots or blurry vision</li>
-          <li>Sudden swelling in your hands or face</li>
-          <li>A blood pressure reading higher than 140/90</li>
-        </ul>
-        <h4 style="margin:0.5rem 0 0.2rem;">Help with Transportation</h4>
-        <p style="font-size:0.78rem;">We understand that getting to your appointments can be a challenge. We found a few local resources that may be able to help with rides. We encourage you to contact them to see if you qualify for their services:</p>
-        <ul style="font-size:0.78rem;">
-          <li>NON-EMERGENCY MEDICAL TRANSPORTATION</li>
-          <li>NON-EMERGENCY MEDICAL TRANSPORTATION FOR MEDICAID RECIPIENTS</li>
-          <li>MEDICAL APPOINTMENTS TRANSPORTATION</li>
-        </ul>
-        <p style="font-size:0.78rem;margin-top:0.5rem;">We are so glad to be on this journey with you. Remember, managing your blood pressure is a team effort, and you've already taken a great first step by monitoring it at home. We're here to answer all your questions and make sure you feel confident and cared for.</p>
-        <p style="font-size:0.78rem;font-style:italic;">Warmly,<br/>Your Prenatal Care Team</p>
-      </div>
-    </div>
-  `;
+function appendJointMessage(item) {
+  const box = $("jointChatMessages");
+  if (!box) return;
+  if (item.role === "update") {
+    state.jointWk24Updated = true;
+    renderJointPlan();
+    const div = document.createElement("div");
+    div.className = "plan-update";
+    div.innerHTML = `<span class="pu-label">Plan updated</span>${escHtml(item.text)}: <del>${escHtml(item.from)}</del> → <ins>${escHtml(item.to)}</ins>`;
+    box.appendChild(div);
+  } else {
+    const div = document.createElement("div");
+    div.className = `chat-bubble role-${item.role}`;
+    div.innerHTML = `<span class="cb-role">${escHtml(item.name)}</span>${escHtml(item.text)}`;
+    box.appendChild(div);
+  }
+  box.scrollTop = box.scrollHeight;
+}
 
-  $("ptab-careTimeline").innerHTML = $("timelineContent") ? $("timelineContent").innerHTML : "<p>Timeline will appear after report generation.</p>";
+function stopJoint() {
+  if (state.jointTimer) { clearTimeout(state.jointTimer); state.jointTimer = null; }
+}
 
-  $("clinicianChatMessages").innerHTML = `
-    <div class="chat-msg system">Use the actions below to modify the report, request timeline changes, or search medical evidence online. All actions are logged for clinician review notes.</div>
-  `;
+function playJoint() {
+  stopJoint();
+  state.jointWk24Updated = false;
+  renderJointPlan();
+  $("jointChatMessages").innerHTML = "";
+  let i = 0;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const step = () => {
+    if (i >= JOINT_SCRIPT.length) { state.jointTimer = null; return; }
+    appendJointMessage(JOINT_SCRIPT[i]);
+    i++;
+    const delay = reduced ? 250 : (JOINT_SCRIPT[i - 1] && JOINT_SCRIPT[i - 1].role === "update" ? 3700 : 3500);
+    state.jointTimer = setTimeout(step, delay);
+  };
+  step();
+}
+
+function renderJointReview() {
+  state.jointWk24Updated = false;
+  renderJointPlan();
+  if ($("jointChatMessages")) $("jointChatMessages").innerHTML = "";
+  // Auto-play the scripted conversation on entering the phase
+  playJoint();
+}
+
+function initJointControls() {
+  const play = $("jointPlayBtn");
+  const reset = $("jointResetBtn");
+  if (play) play.addEventListener("click", playJoint);
+  if (reset) reset.addEventListener("click", () => {
+    stopJoint();
+    state.jointWk24Updated = false;
+    renderJointPlan();
+    $("jointChatMessages").innerHTML = `<div class="chat-msg system">Press "Play conversation" to replay the shared review.</div>`;
+  });
 }
 
 // ── Intake Tab Switching ──
@@ -507,26 +519,12 @@ function initIntakeTabs() {
   });
 }
 
-// ── Panel Tab Switching (Clinician Report/Timeline) ──
-function initPanelTabs() {
-  $$(".panel-tab").forEach((tab) => {
-    tab.addEventListener("click", () => {
-      $$(".panel-tab").forEach((t) => t.classList.remove("active-ptab"));
-      tab.classList.add("active-ptab");
-      $$(".ptab-content").forEach((c) => c.classList.add("hidden"));
-      const el = $("ptab-" + tab.dataset.ptab);
-      if (el) el.classList.remove("hidden");
-    });
-  });
-}
-
 // ── Step Dot Navigation ──
 function initStepDots() {
   $$(".step-dot").forEach((dot) => {
     dot.addEventListener("click", () => {
       const idx = parseInt(dot.dataset.step, 10);
       showPhase(idx);
-      // Sync autoplay index to start of this phase
       state.autoplayIdx = AUTOPLAY_STEPS.findIndex((s) => s.phase === idx);
       if (state.autoplayIdx < 0) state.autoplayIdx = 0;
     });
@@ -555,9 +553,32 @@ function initNavButtons() {
   });
 }
 
-// ── Autoplay (across ALL phases and sub-steps) ──
-// Phase transitions get the full user-selected delay (longer, so user can read).
-// In-phase sub-step transitions use 40% of that delay (shorter, snappier).
+// ── Autoplay: flat list of all sub-steps across all phases ──
+const AUTOPLAY_STEPS = [
+  { phase: 0, action: { type: "intake-tab", tab: "personal" },
+    prompt: "Patient enters personal information: name, date of birth, gender, and pronouns." },
+  { phase: 0, action: { type: "intake-tab", tab: "health" },
+    prompt: "Health history section: LMP date, previous conditions, surgeries, and current symptoms like high blood pressure." },
+  { phase: 0, action: { type: "intake-tab", tab: "allergies" },
+    prompt: "Allergies section: known drug and environmental allergies are recorded." },
+  { phase: 0, action: { type: "intake-tab", tab: "social" },
+    prompt: "Social determinants of health: housing, transportation access, employment, food security, and support system." },
+  { phase: 0, action: { type: "intake-tab", tab: "ehr" },
+    prompt: "EHR data imported automatically: MRN, insurance (Medicaid), primary provider, and obstetric history (G1P0)." },
+  { phase: 1, action: { type: "question", idx: 0 },
+    prompt: "PATHFinder asks about blood pressure management using interactive buttons — no free-text needed." },
+  { phase: 1, action: { type: "question", idx: 1 },
+    prompt: "Appointment challenges: patient selects barriers (transportation, work, childcare) via checkboxes." },
+  { phase: 1, action: { type: "question", idx: 2 },
+    prompt: "Visit modality preference: patient chooses between in-person, telemedicine, or a mix using buttons." },
+  { phase: 1, action: { type: "question", idx: 3 },
+    prompt: "Home monitoring comfort: patient rates willingness to track BP at home using a slider (1–5)." },
+  { phase: 2, action: { type: "show" },
+    prompt: "PATHFinder generates a personalized 13-visit ACOG care plan and a chat window where the patient can ask questions in plain language." },
+  { phase: 3, action: { type: "show" },
+    prompt: "Clinician and patient review the plan together. The patient raises a transport concern and PATHFinder updates the Week 24 visit to telemedicine live." },
+];
+
 function getPhaseDelay() {
   return parseInt($("autoplayDelay").value, 10);
 }
@@ -571,7 +592,6 @@ function scheduleNext() {
     $("autoplayToggle").checked = false;
     return;
   }
-  // Determine if the NEXT step crosses a phase boundary
   const nextStep = AUTOPLAY_STEPS[state.autoplayIdx];
   const isPhaseChange = nextStep.phase !== state.currentPhase;
   const delay = isPhaseChange ? getPhaseDelay() : getSubStepDelay();
@@ -580,7 +600,6 @@ function scheduleNext() {
 
 function startAutoplay() {
   stopAutoplay();
-  // Execute the first step immediately, then schedule
   advanceAutoplay();
 }
 
@@ -602,12 +621,10 @@ function advanceAutoplay() {
 
   const step = AUTOPLAY_STEPS[state.autoplayIdx];
 
-  // Switch phase if needed
   if (step.phase !== state.currentPhase) {
     showPhase(step.phase);
   }
 
-  // Execute action within the phase
   const action = step.action;
   if (action.type === "intake-tab") {
     renderIntakeTab(action.tab);
@@ -615,14 +632,12 @@ function advanceAutoplay() {
     renderQuestion(action.idx);
   }
 
-  // Show the autoplay prompt in the commentary box
   if (step.prompt) {
     $("commentaryText").textContent = step.prompt;
   }
 
   state.autoplayIdx++;
 
-  // Schedule the next step
   if ($("autoplayToggle").checked) {
     scheduleNext();
   }
@@ -638,35 +653,112 @@ function initAutoplay() {
 // ── Report text selection for patient chat ──
 function initReportTextSelection() {
   const reportContent = $("reportContent");
-  const timelineContent = $("timelineContent");
   const chatMessages = $("patientChatMessages");
 
-  function handleSelection(source) {
+  function handleSelection() {
     const sel = window.getSelection();
     const text = sel ? sel.toString().trim() : "";
     if (text.length > 5 && chatMessages) {
       const indicator = document.createElement("div");
       indicator.className = "selected-text-indicator";
-      indicator.innerHTML = `<div class="sti-label">Selected from ${source} pane:</div>"${escHtml(text.substring(0, 120))}${text.length > 120 ? "..." : ""}"`;
+      indicator.innerHTML = `<div class="sti-label">Selected from report:</div>"${escHtml(text.substring(0, 120))}${text.length > 120 ? "..." : ""}"`;
       chatMessages.appendChild(indicator);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   }
 
-  if (reportContent) reportContent.addEventListener("mouseup", () => handleSelection("report"));
-  if (timelineContent) timelineContent.addEventListener("mouseup", () => handleSelection("timeline"));
+  if (reportContent) reportContent.addEventListener("mouseup", handleSelection);
+}
+
+// ── Lightbox ──
+function initLightbox() {
+  const lb = $("lightbox");
+  const lbImg = $("lbImg");
+  const lbCaption = $("lbCaption");
+  const lbCounter = $("lbCounter");
+  const lbClose = $("lbClose");
+  const lbPrev = $("lbPrev");
+  const lbNext = $("lbNext");
+  if (!lb) return;
+
+  let images = [];
+  let current = 0;
+
+  function collectImages() {
+    images = Array.from(document.querySelectorAll("#overviewPage .fig img")).map((img) => ({
+      src: img.src,
+      alt: img.alt,
+      caption: img.closest("figure")?.querySelector("figcaption")?.textContent || "",
+    }));
+  }
+
+  function openAt(idx) {
+    collectImages();
+    if (!images.length) return;
+    current = ((idx % images.length) + images.length) % images.length;
+    const item = images[current];
+    lbImg.src = item.src;
+    lbImg.alt = item.alt;
+    lbCaption.textContent = item.caption;
+    lbCounter.textContent = `${current + 1} / ${images.length}`;
+    lb.hidden = false;
+    document.body.style.overflow = "hidden";
+    lbClose.focus();
+  }
+
+  function close() {
+    lb.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  function navigate(dir) {
+    openAt(current + dir);
+  }
+
+  document.addEventListener("click", (e) => {
+    const img = e.target.closest("#overviewPage .fig img");
+    if (img) {
+      collectImages();
+      const idx = images.findIndex((it) => it.src === img.src);
+      openAt(idx >= 0 ? idx : 0);
+    }
+  });
+
+  lbClose.addEventListener("click", close);
+
+  lb.addEventListener("click", (e) => {
+    if (e.target === lb) close();
+  });
+
+  lbPrev.addEventListener("click", () => navigate(-1));
+  lbNext.addEventListener("click", () => navigate(1));
+
+  document.addEventListener("keydown", (e) => {
+    if (lb.hidden) return;
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowLeft") navigate(-1);
+    if (e.key === "ArrowRight") navigate(1);
+  });
+
+  lb.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    navigate(e.deltaY > 0 ? 1 : -1);
+  }, { passive: false });
 }
 
 // ── Initialize ──
 function init() {
   initTheme();
+  initLottie();
+  initBibtexCopy();
   initPageTabs();
   initIntakeTabs();
-  initPanelTabs();
   initStepDots();
   initNavButtons();
+  initJointControls();
   initAutoplay();
   initReportTextSelection();
+  initLightbox();
   showPhase(0);
 }
 
