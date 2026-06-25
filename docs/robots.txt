@@ -1,2 +1,4 @@
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://realize-lab.github.io/PATHFinder/sitemap.xml
