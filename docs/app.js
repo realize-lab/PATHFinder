@@ -239,7 +239,13 @@ function initBibtexCopy() {
 }
 
 // ── Page Tabs (Overview / Demo) ──
+// Map between URL hash and page panel id so each view is directly linkable
+// and the browser back/forward buttons move between Overview and Demo.
+const PAGE_HASHES = { overviewPage: "#overview", demoPage: "#demo" };
+const HASH_PAGES = { "#overview": "overviewPage", "#demo": "demoPage" };
+
 function showPage(targetId) {
+  if (!PAGE_HASHES[targetId]) targetId = "overviewPage";
   $$(".page-tab-btn").forEach((b) => {
     const isTarget = b.dataset.pageTarget === targetId;
     b.classList.toggle("active", isTarget);
@@ -247,24 +253,48 @@ function showPage(targetId) {
     else b.removeAttribute("aria-current");
   });
   $$(".page-panel").forEach((p) => p.classList.toggle("active", p.id === targetId));
+  // Scroll back to the top so switching views feels like a real page change.
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Resolve the view from the current hash. `#citation` lives inside the
+// overview page, so it maps to Overview (and is scrolled to separately).
+function pageFromHash() {
+  const hash = window.location.hash;
+  if (HASH_PAGES[hash]) return HASH_PAGES[hash];
+  if (hash === "#citation") return "overviewPage";
+  return "overviewPage";
+}
+
+// Navigate to a page by updating the hash (keeps the URL shareable and the
+// back/forward buttons working). Falls back to a direct render if unchanged.
+function navigateToPage(targetId) {
+  const hash = PAGE_HASHES[targetId] || "#overview";
+  if (window.location.hash === hash) showPage(targetId);
+  else window.location.hash = hash;
 }
 
 function initPageTabs() {
   $$(".page-tab-btn").forEach((btn) => {
-    btn.addEventListener("click", () => showPage(btn.dataset.pageTarget));
+    btn.addEventListener("click", () => navigateToPage(btn.dataset.pageTarget));
   });
   // "Try the Demo" buttons on the landing page
   $$("[data-goto-demo]").forEach((btn) => {
-    btn.addEventListener("click", () => showPage("demoPage"));
+    btn.addEventListener("click", () => navigateToPage("demoPage"));
   });
-  // Smooth-scroll to citation
+  // Smooth-scroll to citation (ensure the overview page is visible first)
   $$('a[href="#citation"]').forEach((a) => {
     a.addEventListener("click", (e) => {
       e.preventDefault();
+      showPage("overviewPage");
       const el = $("citation");
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
+
+  // Sync the view with browser navigation (back/forward, direct links, refresh).
+  window.addEventListener("hashchange", () => showPage(pageFromHash()));
+  showPage(pageFromHash());
 }
 
 // ── Step Progress Bar ──
