@@ -666,9 +666,14 @@ function getSubStepDelay() {
 
 function scheduleNext() {
   if (state.autoplayIdx >= AUTOPLAY_STEPS.length) {
-    stopAutoplay();
-    $("autoplayToggle").checked = false;
-    return;
+    // Loop back to Step 1 while autoplay stays enabled.
+    if ($("autoplayToggle").checked) {
+      state.autoplayIdx = 0;
+    } else {
+      stopAutoplay();
+      $("autoplayToggle").checked = false;
+      return;
+    }
   }
   const nextStep = AUTOPLAY_STEPS[state.autoplayIdx];
   const isPhaseChange = nextStep.phase !== state.currentPhase;
@@ -692,9 +697,14 @@ function advanceAutoplay() {
   state.autoplayTimer = null;
 
   if (state.autoplayIdx >= AUTOPLAY_STEPS.length) {
-    stopAutoplay();
-    $("autoplayToggle").checked = false;
-    return;
+    // Loop back to Step 1 while autoplay stays enabled.
+    if ($("autoplayToggle").checked) {
+      state.autoplayIdx = 0;
+    } else {
+      stopAutoplay();
+      $("autoplayToggle").checked = false;
+      return;
+    }
   }
 
   const step = AUTOPLAY_STEPS[state.autoplayIdx];
