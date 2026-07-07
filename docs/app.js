@@ -122,13 +122,13 @@ const PHASES = [
     id: "phase-report",
     label: "Step 3 of 4: Draft Report Review",
     title: "Draft Report & Care Plan",
-    text: "PATHFinder generates a personalized prenatal care report based on ACOG guidelines for greater-than-average-risk patients (chronic hypertension). The patient reviews the report and can ask clarifying questions in plain language through the chat panel.",
+    text: "PATHFinder generates a personalized prenatal care report based on ACOG guidelines for greater-than-average-risk patients (chronic hypertension). Review the plan, then use the “Ask About Your Report” chat (below the plan on mobile) to ask clarifying questions in plain language.",
   },
   {
     id: "phase-joint",
     label: "Step 4 of 4: Joint Clinician + Patient Review",
     title: "Shared Clinician & Patient Review",
-    text: "The clinician and patient review the plan together. In this shared conversation the patient raises a real-life constraint, the clinician proposes a change, and PATHFinder updates the plan live — keeping medically required visits in person while easing access where it is safe to do so.",
+    text: "The clinician and patient review the plan together. In the shared conversation (below the plan on mobile) the patient raises a real-life constraint, the clinician proposes a change, and PATHFinder updates the plan live — keeping medically required visits in person while easing access where it is safe to do so.",
   },
 ];
 
@@ -255,6 +255,7 @@ function showPage(targetId) {
   $$(".page-panel").forEach((p) => p.classList.toggle("active", p.id === targetId));
   // Scroll back to the top so switching views feels like a real page change.
   window.scrollTo({ top: 0, behavior: "smooth" });
+  if (targetId === "demoPage") maybeShowAutoplayHint();
 }
 
 // Resolve the view from the current hash. `#citation` lives inside the
@@ -272,6 +273,36 @@ function navigateToPage(targetId) {
   const hash = PAGE_HASHES[targetId] || "#overview";
   if (window.location.hash === hash) showPage(targetId);
   else window.location.hash = hash;
+}
+
+// ── Autoplay / guided-tour hint ──
+function hintDismissed() {
+  try { return localStorage.getItem("pf-tour-hint") === "seen"; } catch { return false; }
+}
+function dismissHint(remember) {
+  const hint = $("autoplayHint");
+  if (hint) hint.hidden = true;
+  if (remember) { try { localStorage.setItem("pf-tour-hint", "seen"); } catch {} }
+}
+function maybeShowAutoplayHint() {
+  const hint = $("autoplayHint");
+  if (!hint) return;
+  // Don't show if already dismissed or if a tour is already running
+  if (hintDismissed() || $("autoplayToggle").checked) return;
+  hint.hidden = false;
+}
+function initAutoplayHint() {
+  const start = $("autoplayHintStart");
+  const dismiss = $("autoplayHintDismiss");
+  if (start) start.addEventListener("click", () => {
+    dismissHint(true);
+    const toggle = $("autoplayToggle");
+    toggle.checked = true;
+    toggle.dispatchEvent(new Event("change"));
+    // Bring the demo controls into view on small screens
+    $("demoPage").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  if (dismiss) dismiss.addEventListener("click", () => dismissHint(true));
 }
 
 function initPageTabs() {
@@ -313,6 +344,7 @@ function updateStepBar() {
 // ── Show Phase ──
 function showPhase(idx) {
   stopJoint();
+  clearFocusHighlight();
   state.currentPhase = idx;
   $$(".phase-content").forEach((p) => p.classList.remove("active"));
   $(PHASES[idx].id).classList.add("active");
@@ -604,10 +636,26 @@ const AUTOPLAY_STEPS = [
   { phase: 1, action: { type: "question", idx: 3 },
     prompt: "Home monitoring comfort: patient rates willingness to track BP at home using a slider (1–5)." },
   { phase: 2, action: { type: "show" },
-    prompt: "PATHFinder generates a personalized 13-visit ACOG care plan and a chat window where the patient can ask questions in plain language." },
+    prompt: "Step 3 — PATHFinder generates a personalized 13-visit ACOG care plan for a greater-than-average-risk (chronic hypertension) pregnancy." },
+  { phase: 2, action: { type: "scroll-to", target: "reportChatPanel", highlight: "reportChatPanel" },
+    prompt: "Now the patient can ask about the plan in plain language. Here they ask what low-dose aspirin does — PATHFinder answers in the chat on the right (scroll down on mobile)." },
   { phase: 3, action: { type: "show" },
-    prompt: "Clinician and patient review the plan together. The patient raises a transport concern and PATHFinder updates the Week 24 visit to telemedicine live." },
+    prompt: "Step 4 — The clinician and patient open a shared review of the finalized plan together." },
+  { phase: 3, action: { type: "scroll-to", target: "jointChatPanel", highlight: "jointChatPanel" },
+    prompt: "Watch the shared conversation: the patient raises a transportation concern, the clinician agrees, and PATHFinder updates the Week 24 visit to telemedicine live." },
 ];
+
+// Draw the reader's attention to a specific panel (used by scroll sub-steps).
+function clearFocusHighlight() {
+  $$(".focus-highlight").forEach((el) => el.classList.remove("focus-highlight"));
+}
+function highlightFocus(id) {
+  clearFocusHighlight();
+  const el = $(id);
+  if (!el) return;
+  el.classList.add("focus-highlight");
+  setTimeout(() => el.classList.remove("focus-highlight"), 4400);
+}
 
 function getPhaseDelay() {
   return parseInt($("autoplayDelay").value, 10);
@@ -660,6 +708,10 @@ function advanceAutoplay() {
     renderIntakeTab(action.tab);
   } else if (action.type === "question") {
     renderQuestion(action.idx);
+  } else if (action.type === "scroll-to") {
+    const el = $(action.target);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (action.highlight) highlightFocus(action.highlight);
   }
 
   if (step.prompt) {
@@ -675,7 +727,7 @@ function advanceAutoplay() {
 
 function initAutoplay() {
   $("autoplayToggle").addEventListener("change", (e) => {
-    if (e.target.checked) startAutoplay();
+    if (e.target.checked) { dismissHint(true); startAutoplay(); }
     else stopAutoplay();
   });
 }
@@ -787,6 +839,7 @@ function init() {
   initNavButtons();
   initJointControls();
   initAutoplay();
+  initAutoplayHint();
   initReportTextSelection();
   initLightbox();
   showPhase(0);

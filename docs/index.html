@@ -178,33 +178,50 @@
 
     <!-- ===== DEMO PAGE ===== -->
     <section id="demoPage" class="page-panel" aria-label="Interactive demo">
-      <!-- Controls row: prev/next + step dots + autoplay -->
+
+      <!-- Guided-tour / autoplay hint (shown on first visit, big & small screens) -->
+      <div id="autoplayHint" class="autoplay-hint" role="note" hidden>
+        <span class="ah-icon" aria-hidden="true">✨</span>
+        <span class="ah-text"><strong>New here?</strong> Take the <em>guided tour</em> — PATHFinder will walk you through all four steps automatically, with a note explaining each one.</span>
+        <button id="autoplayHintStart" class="btn btn-primary btn-xs" type="button">▶ Start guided tour</button>
+        <button id="autoplayHintDismiss" class="ah-close" type="button" aria-label="Dismiss tour hint">✕</button>
+      </div>
+
+      <!-- Controls row: step dots + phase label + navigation + autoplay -->
       <section class="controls-row" aria-label="Demo navigation">
-        <button id="prevBtn" class="btn btn-secondary btn-sm" disabled>Prev</button>
-        <div class="step-dots" role="tablist" aria-label="Demo steps">
-          <button class="step-dot active" data-step="0" aria-current="step">1</button>
-          <div class="step-connector"></div>
-          <button class="step-dot" data-step="1">2</button>
-          <div class="step-connector"></div>
-          <button class="step-dot" data-step="2">3</button>
-          <div class="step-connector"></div>
-          <button class="step-dot" data-step="3">4</button>
+        <div class="cr-steps">
+          <div class="step-dots" role="tablist" aria-label="Demo steps">
+            <button class="step-dot active" data-step="0" aria-current="step" aria-label="Step 1: Intake Form">1</button>
+            <div class="step-connector"></div>
+            <button class="step-dot" data-step="1" aria-label="Step 2: PATHFinder Questions">2</button>
+            <div class="step-connector"></div>
+            <button class="step-dot" data-step="2" aria-label="Step 3: Draft Report Review">3</button>
+            <div class="step-connector"></div>
+            <button class="step-dot" data-step="3" aria-label="Step 4: Joint Review">4</button>
+          </div>
+          <span id="phaseLabel" class="phase-label">Step 1 of 4: Intake Form</span>
         </div>
-        <span id="phaseLabel" class="phase-label">Step 1 of 4: Intake Form</span>
-        <div class="autoplay-wrap">
-          <label class="autoplay-label"><input type="checkbox" id="autoplayToggle" /> Autoplay</label>
-          <select id="autoplayDelay" class="delay-select" aria-label="Autoplay delay">
+        <div class="cr-actions">
+          <button id="prevBtn" class="btn btn-secondary btn-sm" disabled>‹ Prev</button>
+          <label class="autoplay-label" title="Auto-advance through the demo">
+            <input type="checkbox" id="autoplayToggle" />
+            <span class="autoplay-text at-off" aria-hidden="true">▶ Auto-tour</span>
+            <span class="autoplay-text at-on" aria-hidden="true">⏸ Stop</span>
+            <span class="sr-only">Autoplay guided tour</span>
+          </label>
+          <select id="autoplayDelay" class="delay-select" aria-label="Autoplay speed per step">
             <option value="5000">5s</option>
             <option value="8000" selected>8s</option>
             <option value="12000">12s</option>
             <option value="16000">16s</option>
           </select>
+          <button id="nextBtn" class="btn btn-primary btn-sm">Next ›</button>
         </div>
-        <button id="nextBtn" class="btn btn-primary btn-sm">Next</button>
       </section>
 
-      <!-- Commentary -->
+      <!-- Commentary / annotation for the current step -->
       <section id="commentaryBox" class="commentary-row" aria-live="polite">
+        <span class="commentary-badge" aria-hidden="true">What's happening</span>
         <strong id="commentaryTitle"></strong>
         <span class="commentary-sep">&mdash;</span>
         <span id="commentaryText"></span>
@@ -286,41 +303,27 @@
 
       <!-- ===== Phase 2: PATHFinder Agent Questions ===== -->
       <section id="phase-questions" class="phase-panel phase-content" aria-label="Step 2: Follow-up questions">
-        <div class="questions-layout">
-          <aside class="sidebar-summary" aria-label="Patient summary">
-            <div class="sidebar-section">PERSONAL</div>
-            <div class="sf-row"><span class="sf-label">Name</span><span class="sf-value">V B</span></div>
-            <div class="sf-row"><span class="sf-label">DOB</span><span class="sf-value">01/01/1999</span></div>
-            <div class="sf-row"><span class="sf-label">Gender</span><span class="sf-value">Female</span></div>
-            <div class="sidebar-section">HEALTH</div>
-            <div class="sf-row"><span class="sf-label">Current</span><span class="sf-value">High BP</span></div>
-            <div class="sf-row"><span class="sf-label">LMP</span><span class="sf-value">2025-12-04</span></div>
-            <div class="sidebar-section">SOCIAL</div>
-            <div class="sf-row"><span class="sf-label">Transport</span><span class="sf-value">Limited</span></div>
-            <div class="sf-row"><span class="sf-label">Food</span><span class="sf-value">Insecure</span></div>
-          </aside>
-          <div class="questions-main">
-            <div class="questions-top-row">
-              <img class="q-logo" src="logo.png" alt="" />
-              <strong>Form EHR Workflow</strong>
-              <span class="muted-text">V B</span>
-              <div class="stepper-mini">
-                <span class="sm-dot sm-active">Questions</span>
-                <span class="sm-line"></span>
-                <span class="sm-dot">Care Plan</span>
-              </div>
+        <div class="questions-main">
+          <div class="questions-top-row">
+            <img class="q-logo" src="logo.png" alt="" />
+            <strong>PATHFinder Follow-up</strong>
+            <span class="muted-text">V B</span>
+            <div class="stepper-mini">
+              <span class="sm-dot sm-active">Questions</span>
+              <span class="sm-line"></span>
+              <span class="sm-dot">Care Plan</span>
             </div>
-            <div id="questionProgress" class="question-progress">
-              <span>Question 1 of 4</span>
-              <div class="q-progress-bar"><div class="q-progress-fill" style="width:0%"></div></div>
-              <span>0%</span>
-            </div>
-            <div id="questionArea" class="question-area"></div>
-            <div class="chat-input-row">
-              <label class="sr-only" for="questionChatInput">Type your message</label>
-              <input type="text" id="questionChatInput" placeholder="Type your message..." />
-              <button class="btn btn-primary btn-sm">Send</button>
-            </div>
+          </div>
+          <div id="questionProgress" class="question-progress">
+            <span>Question 1 of 4</span>
+            <div class="q-progress-bar"><div class="q-progress-fill" style="width:0%"></div></div>
+            <span>0%</span>
+          </div>
+          <div id="questionArea" class="question-area"></div>
+          <div class="chat-input-row">
+            <label class="sr-only" for="questionChatInput">Type your message</label>
+            <input type="text" id="questionChatInput" placeholder="Type your message..." />
+            <button class="btn btn-primary btn-sm">Send</button>
           </div>
         </div>
       </section>
@@ -342,7 +345,7 @@
             <h3>Your Personalized Care Report</h3>
             <div id="reportContent" class="panel-scroll"></div>
           </div>
-          <div class="panel-card chat-panel">
+          <div id="reportChatPanel" class="panel-card chat-panel">
             <h3>Ask About Your Report</h3>
             <div id="patientChatMessages" class="chat-messages"></div>
             <div class="chat-input-row">
@@ -370,7 +373,7 @@
             <h3>Current Care Plan</h3>
             <div id="jointPlan" class="panel-scroll"></div>
           </div>
-          <div class="panel-card chat-panel">
+          <div id="jointChatPanel" class="panel-card chat-panel">
             <h3>Shared Conversation</h3>
             <div id="jointChatMessages" class="chat-messages chat-roles"></div>
             <div class="chat-input-row">

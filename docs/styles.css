@@ -176,18 +176,25 @@ body {
 .page-panel { display: none; flex: 1; min-height: 0; overflow: hidden; flex-direction: column; }
 .page-panel.active { display: flex; }
 .about-scroll { overflow-y: auto; padding: 1.25rem 1.5rem 2.5rem; }
+/* The overview page is a simple scrolling document, not a flex column.
+   Using block layout lets .landing behave as a normal centered block that
+   respects the viewport width (a flex item with auto cross-margins would
+   instead size to its widest content and overflow on small screens). */
+.page-panel.about-scroll.active { display: block; }
 
 /* ===== Demo Page ===== */
 #demoPage { padding: 0.5rem 0.75rem; gap: 0.4rem; }
 
 /* ===== Controls Row ===== */
 .controls-row {
-  display: flex; align-items: center; gap: 0.6rem;
+  display: flex; align-items: center; gap: 0.75rem;
   padding: 0.4rem 0.65rem;
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 8px; flex-shrink: 0;
 }
-.step-dots { display: flex; align-items: center; }
+.cr-steps { display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0; }
+.cr-actions { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
+.step-dots { display: flex; align-items: center; flex-shrink: 0; }
 .step-dot {
   width: 30px; height: 30px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
@@ -200,26 +207,67 @@ body {
 .step-dot.completed { background: var(--teal); color: #fff; border-color: var(--teal); }
 .step-connector { width: 32px; height: 2px; background: var(--line); }
 .step-connector.done { background: var(--teal); }
-.phase-label { font-weight: 700; color: var(--primary-2); font-size: 0.9rem; flex: 1; text-align: center; }
-.autoplay-wrap { display: flex; align-items: center; gap: 0.4rem; }
-.autoplay-label { font-size: 0.8rem; color: var(--muted); display: flex; align-items: center; gap: 0.25rem; cursor: pointer; }
-.autoplay-label input { width: auto; cursor: pointer; }
+.phase-label { font-weight: 700; color: var(--primary-2); font-size: 0.9rem; min-width: 0; }
+
+/* Autoplay as an obvious pill toggle */
+.autoplay-label {
+  display: inline-flex; align-items: center; cursor: pointer; user-select: none;
+  border: 1px solid var(--primary-300); border-radius: 999px;
+  padding: 0.3rem 0.75rem; font-size: 0.82rem; font-weight: 700;
+  color: var(--primary); background: var(--primary-50); transition: all 0.15s;
+  white-space: nowrap;
+}
+.autoplay-label:hover { border-color: var(--primary); background: var(--primary-100); }
+.autoplay-label input { position: absolute; opacity: 0; width: 0; height: 0; }
+.autoplay-text.at-on { display: none; }
+.autoplay-label:has(input:checked) {
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  color: #fff; border-color: var(--primary);
+}
+.autoplay-label:has(input:checked) .autoplay-text.at-off { display: none; }
+.autoplay-label:has(input:checked) .autoplay-text.at-on { display: inline; }
+.autoplay-label:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
 .delay-select {
-  font-size: 0.8rem; padding: 0.15rem 0.3rem; border-radius: 5px;
+  font-size: 0.8rem; padding: 0.2rem 0.3rem; border-radius: 5px;
   border: 1px solid var(--line); background: var(--surface); color: var(--text);
 }
 
+/* ===== Autoplay / guided-tour hint ===== */
+.autoplay-hint {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0.55rem 0.75rem; flex-shrink: 0;
+  background: linear-gradient(90deg, var(--primary-50), var(--brand-bg));
+  border: 1px solid var(--primary-300); border-radius: 10px;
+  box-shadow: var(--shadow);
+  animation: hintIn 0.3s ease;
+}
+.autoplay-hint[hidden] { display: none; }
+@keyframes hintIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.autoplay-hint .ah-icon { font-size: 1.15rem; flex-shrink: 0; }
+.autoplay-hint .ah-text { font-size: 0.86rem; line-height: 1.4; color: var(--text); flex: 1; min-width: 0; }
+.autoplay-hint .ah-text strong { color: var(--primary-2); }
+.autoplay-hint .ah-close {
+  border: 0; background: transparent; color: var(--muted); cursor: pointer;
+  font-size: 0.95rem; line-height: 1; padding: 0.35rem; border-radius: 6px; flex-shrink: 0;
+}
+.autoplay-hint .ah-close:hover { background: var(--primary-100); color: var(--primary-2); }
+
 /* ===== Commentary ===== */
 .commentary-row {
-  padding: 0.35rem 0.65rem;
+  padding: 0.45rem 0.65rem;
   background: var(--primary-50); border: 1px solid var(--primary-200);
   border-radius: 8px; flex-shrink: 0;
-  font-size: 0.88rem; line-height: 1.4;
-  display: flex; align-items: baseline; gap: 0.5rem;
+  font-size: 0.88rem; line-height: 1.45;
+  display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap;
 }
-.commentary-row strong { color: var(--primary-2); white-space: nowrap; }
+.commentary-badge {
+  flex-shrink: 0; align-self: center;
+  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+  color: #fff; background: var(--primary); padding: 0.12rem 0.5rem; border-radius: 999px;
+}
+.commentary-row strong { color: var(--primary-2); }
 .commentary-sep { color: var(--primary-300); }
-.commentary-row span:last-child { color: var(--muted); }
+.commentary-row #commentaryText { color: var(--muted); }
 
 /* ===== Buttons ===== */
 .btn {
@@ -270,7 +318,11 @@ input, textarea, select {
   color: var(--text); background: var(--surface);
 }
 input:focus, textarea:focus { border-color: var(--primary); outline: 2px solid var(--primary-100); }
-input[disabled], textarea[disabled] { background: var(--surface-2); color: var(--muted); }
+/* Disabled inputs hold pre-filled EHR values — keep them fully legible
+   (the surface tint already signals they are read-only) instead of muted,
+   which was too low-contrast in the sepia theme. */
+input[disabled], textarea[disabled] { background: var(--surface-2); color: var(--text); -webkit-text-fill-color: var(--text); opacity: 1; }
+label { font-weight: 600; }
 
 /* ===== Phase 2: Questions ===== */
 .questions-layout { display: flex; gap: 0.65rem; flex: 1; min-height: 0; overflow: hidden; }
@@ -286,7 +338,10 @@ input[disabled], textarea[disabled] { background: var(--surface-2); color: var(-
 .sf-row { display: flex; justify-content: space-between; padding: 0.12rem 0; border-bottom: 1px solid var(--surface-2); }
 .sf-label { color: var(--muted); font-size: 0.8rem; }
 .sf-value { font-weight: 600; font-size: 0.8rem; }
-.questions-main { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 0.3rem; }
+.questions-main {
+  display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0;
+  gap: 0.4rem; width: 100%; max-width: 820px; margin-inline: auto;
+}
 .questions-top-row { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; }
 .q-logo { width: 24px; height: 24px; object-fit: contain; }
 .muted-text { color: var(--muted); font-size: 0.85rem; }
@@ -341,8 +396,12 @@ input[disabled], textarea[disabled] { background: var(--surface-2); color: var(-
 }
 .clinician-status-btns { display: flex; gap: 0.3rem; margin-left: auto; }
 .three-panel { display: grid; grid-template-columns: 1fr 1fr 320px; gap: 0.5rem; flex: 1; min-height: 0; }
+/* Let grid/flex panels shrink to their track instead of their widest word,
+   so text flows continuously rather than wrapping one word per line. */
+.two-panel > *, .three-panel > *, .questions-layout > *, .panel-card, .chat-panel { min-width: 0; }
+.panel-scroll, .chat-messages, .q-message, .chat-bubble, .plan-row, .report-section { overflow-wrap: break-word; word-break: normal; }
 .panel-card {
-  display: flex; flex-direction: column; min-height: 0;
+  display: flex; flex-direction: column; min-height: 0; min-width: 0;
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 8px; padding: 0.5rem; box-shadow: var(--shadow);
 }
@@ -419,6 +478,18 @@ input[disabled], textarea[disabled] { background: var(--surface-2); color: var(-
 }
 [data-theme="dark"] .pdf-page { background: #f8fafc; color: #111827; }
 
+/* ===== Focus highlight (draws attention to the panel to read) ===== */
+.focus-highlight {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--primary-50), var(--shadow);
+  animation: focusPulse 1.4s ease-in-out 2;
+}
+@keyframes focusPulse {
+  0%, 100% { outline-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-50), var(--shadow); }
+  50% { outline-color: var(--accent); box-shadow: 0 0 0 9px var(--primary-100), var(--shadow); }
+}
+
 /* ===== Two-panel layout (report & joint review) ===== */
 .two-panel { display: grid; grid-template-columns: 1fr 380px; gap: 0.6rem; flex: 1; min-height: 0; }
 
@@ -452,6 +523,10 @@ input[disabled], textarea[disabled] { background: var(--surface-2); color: var(-
 
 /* ===== Landing page ===== */
 .landing { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.1rem; }
+/* Let flex/grid children shrink below their min-content width so wide
+   content (e.g. the BibTeX <pre>) scrolls/wraps internally instead of
+   forcing the whole column wider than the viewport on small screens. */
+.landing, .landing > *, .section-split > *, .fig-row > * { min-width: 0; }
 .hero {
   display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.5rem; align-items: center;
   background: linear-gradient(180deg, var(--surface) 0%, var(--brand-bg) 100%);
@@ -548,15 +623,75 @@ blockquote cite { display: block; font-style: normal; font-weight: 700; color: v
   html, body { overflow: auto; }
   .page-shell { height: auto; min-height: 100vh; }
   #mainContent { overflow: visible; }
-  .phase-content { overflow: auto; }
+  .phase-content { overflow: visible; }
+  /* Give stacked chat/report panels a sensible height instead of collapsing */
+  .panel-scroll, .chat-messages, .question-area { max-height: 60vh; }
 }
-@media (max-width: 760px) {
+
+/* ===== Tablet & phone (<= 820px): mobile demo layout ===== */
+@media (max-width: 820px) {
   .form-grid { grid-template-columns: 1fr; }
-  .top-bar { flex-wrap: wrap; }
+  .top-bar { flex-wrap: wrap; row-gap: 0.5rem; padding: 0.5rem 0.85rem; }
+  .tb-center { order: 3; flex-basis: 100%; justify-content: center; }
   .tb-desc { display: none; }
+  .page-tab-btn { flex: 1; max-width: 180px; padding: 0.45rem 0.85rem; }
+
   .hero-title { font-size: 2.2rem; }
-  .controls-row { flex-wrap: wrap; }
-  .phase-label { flex-basis: 100%; order: 5; }
+  .landing-section { padding: 1.1rem 1.1rem; }
+
+  /* --- Demo: two-line control bar, sticky bottom navigation --- */
+  #demoPage { padding: 0.5rem 0.6rem; }
+  .cr-steps { flex-wrap: wrap; justify-content: center; gap: 0.4rem 0.6rem; }
+  .phase-label { flex-basis: 100%; text-align: center; }
+  .step-connector { width: 20px; }
+
+  /* Move Prev / Auto-tour / Next into a fixed, thumb-friendly bottom bar */
+  .cr-actions {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    justify-content: space-between; gap: 0.5rem;
+    padding: 0.55rem 0.75rem calc(0.55rem + env(safe-area-inset-bottom, 0px));
+    background: var(--surface); border-top: 1px solid var(--border);
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.12);
+  }
+  .cr-actions #prevBtn, .cr-actions #nextBtn { flex: 1; padding: 0.6rem 0.5rem; font-size: 0.9rem; }
+  .cr-actions .autoplay-label { flex: 1.3; justify-content: center; padding: 0.55rem 0.5rem; }
+  .cr-actions .delay-select { padding: 0.5rem 0.3rem; }
+  /* Keep content clear of the fixed bar */
+  #demoPage .phase-panel.active { padding-bottom: 4.5rem; }
+
+  .commentary-row { padding: 0.55rem 0.7rem; }
+  .autoplay-hint { flex-wrap: wrap; }
+  .autoplay-hint .ah-text { flex-basis: 100%; }
+
+  /* Report tables scroll horizontally instead of overflowing */
+  .report-table { min-width: 520px; }
+  .panel-scroll { overflow-x: auto; }
+}
+
+/* ===== Small phones (<= 480px) ===== */
+@media (max-width: 480px) {
+  body { font-size: 14px; }
+  .about-scroll { padding: 1rem 0.9rem 2rem; }
+  .tb-title { font-size: 0.95rem; }
+  .tb-michigan { width: 28px; height: 28px; }
+
+  .hero { padding: 1.25rem 1.1rem; border-radius: 14px; }
+  .hero-title { font-size: 1.85rem; }
+  .hero-subtitle { font-size: 1.05rem; }
+  .hero-tagline { font-size: 0.95rem; }
+  .hero-actions { flex-direction: column; }
+  .hero-actions .btn { justify-content: center; width: 100%; }
+  .lottie-hero { max-width: 300px; }
+
+  .landing-section h2 { font-size: 1.2rem; }
+  .team-grid { grid-template-columns: 1fr; }
+  .citation-head { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+
+  /* Demo: stack step dots + label compactly */
+  .step-dot { width: 26px; height: 26px; font-size: 0.8rem; }
+  .phase-label { font-size: 0.82rem; }
+  .commentary-badge { font-size: 0.62rem; }
+  .cr-actions .delay-select { font-size: 0.75rem; }
 }
 
 /* ===== Lightbox ===== */
