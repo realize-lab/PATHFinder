@@ -101,6 +101,13 @@ html { height: 100%; }
   outline-offset: 2px;
   border-radius: 4px;
 }
+/* Default browser link blue fails contrast on the dark and sepia surfaces,
+   so links inherit the themed primary and stay underlined for users who
+   cannot rely on colour alone. */
+a { color: var(--primary); text-underline-offset: 0.15em; }
+a:hover { color: var(--primary-2); }
+[data-theme="dark"] a { color: var(--primary-500); }
+[data-theme="dark"] a:hover { color: var(--primary-700); }
 body {
   height: 100%;
   overflow: hidden;
@@ -318,10 +325,12 @@ input, textarea, select {
   color: var(--text); background: var(--surface);
 }
 input:focus, textarea:focus { border-color: var(--primary); outline: 2px solid var(--primary-100); }
-/* Disabled inputs hold pre-filled EHR values — keep them fully legible
+/* Pre-filled EHR values are read-only rather than disabled so they stay in the
+   tab order and are announced by screen readers. Keep them fully legible
    (the surface tint already signals they are read-only) instead of muted,
    which was too low-contrast in the sepia theme. */
-input[disabled], textarea[disabled] { background: var(--surface-2); color: var(--text); -webkit-text-fill-color: var(--text); opacity: 1; }
+input[disabled], textarea[disabled],
+input[readonly], textarea[readonly] { background: var(--surface-2); color: var(--text); -webkit-text-fill-color: var(--text); opacity: 1; }
 label { font-weight: 600; }
 
 /* ===== Phase 2: Questions ===== */
@@ -571,9 +580,97 @@ blockquote cite { display: block; font-style: normal; font-weight: 700; color: v
 .fig-mid { margin-top: 0.9rem; max-width: 640px; margin-left: auto; margin-right: auto; }
 .fig-mid img { object-fit: contain; }
 
+/* Sub-headings inside landing sections */
+.sub-h {
+  font-size: 1.02rem; font-weight: 700; color: var(--primary-2);
+  margin: 1.1rem 0 0.5rem;
+}
+
+/* Definition-style metadata list (venue, DOI, keywords…) */
+.meta-list { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.45rem; }
+.meta-row {
+  display: grid; grid-template-columns: 8.5rem 1fr; gap: 0.75rem;
+  font-size: 0.92rem; line-height: 1.55;
+}
+.meta-row dt { font-weight: 700; color: var(--primary); }
+.meta-row dd { margin: 0; color: var(--text); }
+
+/* Bulleted / numbered prose lists */
+.feature-list, .stage-list {
+  margin: 0.7rem 0 0; padding-left: 1.3rem;
+  display: flex; flex-direction: column; gap: 0.55rem;
+  font-size: 0.98rem; line-height: 1.6;
+}
+.feature-list li::marker, .stage-list li::marker { color: var(--primary); font-weight: 700; }
+.stage-list { counter-reset: none; }
+
+/* Data tables */
+.table-scroll { overflow-x: auto; margin-top: 1rem; }
+.data-table {
+  border-collapse: collapse; width: 100%; min-width: 340px;
+  font-size: 0.95rem;
+}
+.data-table caption {
+  caption-side: bottom; text-align: left; padding-top: 0.5rem;
+  font-size: 0.85rem; color: var(--muted); line-height: 1.4;
+}
+.data-table th, .data-table td {
+  padding: 0.5rem 0.8rem; text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.data-table thead th {
+  color: var(--primary-2); font-weight: 700;
+  border-bottom: 2px solid var(--primary);
+}
+.data-table tbody th { font-weight: 600; }
+.data-table td { font-variant-numeric: tabular-nums; }
+.data-table tbody tr:last-child th, .data-table tbody tr:last-child td { border-bottom: none; }
+
+/* FAQ */
+.faq-item {
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface-2); margin-top: 0.6rem;
+}
+.faq-item > summary {
+  cursor: pointer; padding: 0.7rem 0.95rem;
+  font-weight: 700; color: var(--primary-2); font-size: 0.98rem;
+  list-style: none; display: flex; align-items: center; gap: 0.55rem;
+}
+.faq-item > summary::-webkit-details-marker { display: none; }
+.faq-item > summary::before {
+  content: "▸"; color: var(--primary); flex: none;
+  transition: transform 0.15s ease;
+}
+.faq-item[open] > summary::before { transform: rotate(90deg); }
+.faq-item > summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.faq-item > p {
+  padding: 0 0.95rem 0.85rem; margin: 0;
+  font-size: 0.95rem; line-height: 1.65; color: var(--text);
+}
+
 /* Citation */
 .citation-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.6rem; }
 .citation-head h2 { margin-bottom: 0; }
+.acm-ref {
+  font-size: 0.93rem; line-height: 1.65; color: var(--text);
+  padding: 0.7rem 0.95rem; border-left: 4px solid var(--primary);
+  background: var(--primary-50); border-radius: 0 8px 8px 0;
+}
+.link-row {
+  list-style: none; padding: 0; margin: 0.9rem 0 0;
+  display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem;
+  font-size: 0.92rem;
+}
+.link-row li { position: relative; }
+.link-row li + li::before {
+  content: "·"; position: absolute; left: -0.7rem; color: var(--muted);
+}
+
+/* Footer */
+.site-footer { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+.site-footer p + p { margin-top: 0.45rem; }
+.site-footer strong { color: var(--text); }
+.footer-note { font-style: italic; }
 .citation-block {
   background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
   padding: 0.9rem 1.1rem; font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
@@ -684,6 +781,8 @@ blockquote cite { display: block; font-style: normal; font-weight: 700; color: v
   .lottie-hero { max-width: 300px; }
 
   .landing-section h2 { font-size: 1.2rem; }
+  .meta-row { grid-template-columns: 1fr; gap: 0.1rem; }
+  .meta-row dt { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; }
   .team-grid { grid-template-columns: 1fr; }
   .citation-head { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
 

@@ -12,15 +12,188 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PATHFinder — Agents for Tailored Prenatal Care</title>
-  <meta name="description" content="PATHFinder is an LLM-based agentic system for safe, scalable, and aligned prenatal care planning — gathering patient context, mapping resources, and individualizing visit cadence with clinician oversight." />
+  <title>PATHFinder Agent for Tailored Prenatal Care — LLM Agent for Personalized Pregnancy Care Plans</title>
+  <meta name="description" content="PATHFinder Agent is an end-to-end conversational AI agent that builds individualized prenatal care plans aligned with the ACOG PATH guidelines. It gathers medical and social context through dialogue, matches patients to Michigan 211 community resources, tailors visit frequency and telehealth modality, and keeps clinicians in the loop. Published at the 2026 ACM Interactive Health Conference (IH '26)." />
+  <meta name="author" content="Vaibhav Balloli, Carissa Samuel, Samia Abdelnabi, Alex Peahl, Elizabeth Bondi-Kelly" />
+  <meta name="keywords" content="prenatal care, maternal health, women's health, reproductive health, preventive care, LLM agent, AI agent in healthcare, conversational agent, agentic AI, ACOG PATH guidelines, tailored prenatal care, personalized care plan, clinician in the loop, human oversight, social determinants of health, Michigan 211, health equity, digital health, obstetrics, midwifery, care plan generation, large language models, GPT-5, Gemini, healthcare AI evaluation" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="theme-color" content="#00274c" />
+  <link rel="canonical" href="https://realize-lab.github.io/PATHFinder/" />
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="apple-touch-icon" href="logo.png" />
 
   <!-- Open Graph / social -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="PATHFinder — Agents for Tailored Prenatal Care" />
-  <meta property="og:description" content="An agentic system for safe, scalable, and aligned prenatal care planning, with clinician oversight." />
-  <meta property="og:image" content="figures/pathfinder_overview.png" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="PATHFinder — REALIZE Lab, University of Michigan" />
+  <meta property="og:url" content="https://realize-lab.github.io/PATHFinder/" />
+  <meta property="og:title" content="PATHFinder Agent for Tailored Prenatal Care" />
+  <meta property="og:description" content="An LLM agent that turns ACOG PATH guidelines into individualized prenatal care plans — medical and social context, community resources, visit cadence, and clinician oversight. ACM Interactive Health 2026." />
+  <meta property="og:image" content="https://realize-lab.github.io/PATHFinder/figures/pathfinder_overview.png" />
+  <meta property="og:image:width" content="2284" />
+  <meta property="og:image:height" content="904" />
+  <meta property="og:image:alt" content="PATHFinder system overview: a prenatal care agent connecting patient context, ACOG PATH guidelines, and Michigan 211 community resources." />
+  <meta property="og:locale" content="en_US" />
+  <meta property="article:published_time" content="2026-07-04" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="PATHFinder Agent for Tailored Prenatal Care" />
+  <meta name="twitter:description" content="An LLM agent that turns ACOG PATH guidelines into individualized prenatal care plans, with clinician oversight. ACM Interactive Health 2026." />
+  <meta name="twitter:image" content="https://realize-lab.github.io/PATHFinder/figures/pathfinder_overview.png" />
+  <meta name="twitter:image:alt" content="PATHFinder system overview diagram." />
+
+  <!-- Bibliographic metadata -->
+  <meta name="citation_title" content="PATHFinder Agent for Tailored Prenatal Care" />
+  <meta name="citation_author" content="Balloli, Vaibhav" />
+  <meta name="citation_author_institution" content="University of Michigan, Ann Arbor, USA" />
+  <meta name="citation_author" content="Samuel, Carissa" />
+  <meta name="citation_author_institution" content="University of Michigan, Ann Arbor, USA" />
+  <meta name="citation_author" content="Abdelnabi, Samia" />
+  <meta name="citation_author_institution" content="University of Michigan, Ann Arbor, USA" />
+  <meta name="citation_author" content="Peahl, Alex" />
+  <meta name="citation_author_institution" content="University of Michigan, Ann Arbor, USA" />
+  <meta name="citation_author" content="Bondi-Kelly, Elizabeth" />
+  <meta name="citation_author_institution" content="University of Michigan, Ann Arbor, USA" />
+  <meta name="citation_publication_date" content="2026/07/04" />
+  <meta name="citation_conference_title" content="Proceedings of the 2026 ACM Interactive Health Conference (IH '26)" />
+  <meta name="citation_inbook_title" content="Proceedings of the 2026 ACM Interactive Health Conference (IH '26)" />
+  <meta name="citation_publisher" content="Association for Computing Machinery" />
+  <meta name="citation_isbn" content="979-8-4007-2422-0" />
+  <meta name="citation_doi" content="10.1145/3786579.3804996" />
+  <meta name="citation_firstpage" content="1" />
+  <meta name="citation_lastpage" content="5" />
+  <meta name="citation_pdf_url" content="https://realize-lab.github.io/PATHFinder/PATHFinder_ACM_IH.pdf" />
+  <meta name="citation_abstract_html_url" content="https://realize-lab.github.io/PATHFinder/" />
+  <meta name="citation_language" content="en" />
+  <meta name="citation_keywords" content="Large Language Models; Large Language Model Agents; Health; Reproductive Health; Maternal Health; Healthcare Agents; LLM-in-the-loop" />
+  <meta name="dc.title" content="PATHFinder Agent for Tailored Prenatal Care" />
+  <meta name="dc.creator" content="Vaibhav Balloli" />
+  <meta name="dc.creator" content="Carissa Samuel" />
+  <meta name="dc.creator" content="Samia Abdelnabi" />
+  <meta name="dc.creator" content="Alex Peahl" />
+  <meta name="dc.creator" content="Elizabeth Bondi-Kelly" />
+  <meta name="dc.date" content="2026-07-04" />
+  <meta name="dc.publisher" content="Association for Computing Machinery" />
+  <meta name="dc.identifier" content="10.1145/3786579.3804996" />
+  <meta name="dc.rights" content="Creative Commons Attribution 4.0 International (CC BY 4.0)" />
+  <meta name="dc.language" content="en" />
+  <meta name="dc.type" content="Text.Article" />
+
+  <link rel="alternate" type="application/pdf" href="PATHFinder_ACM_IH.pdf" title="PATHFinder Agent for Tailored Prenatal Care (PDF)" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ScholarlyArticle",
+        "@id": "https://realize-lab.github.io/PATHFinder/#article",
+        "headline": "PATHFinder Agent for Tailored Prenatal Care",
+        "name": "PATHFinder Agent for Tailored Prenatal Care",
+        "alternateName": "PATHFinder: Planner for Appropriate Tailored Healthcare",
+        "abstract": "Prenatal care is an important preventive service designed to improve outcomes for pregnant individuals. The American College of Obstetricians and Gynecologists (ACOG) recently introduced guidelines advocating tailored prenatal care, called PATH (Plan for Tailored Healthcare). We present PATHFinder Agent (Planner for Appropriate Tailored Healthcare), an end-to-end conversational agentic system that gathers patient health and social context through structured dialogue, curates individualized prenatal care plans aligned with PATH guidelines, and surfaces community resources from Michigan 211. The system features a four-stage workflow spanning patient intake, dynamic interaction, plan synthesis, and clinician oversight. We evaluate frontier large language models (LLMs) on expert-curated rubrics across five clinical dimensions, finding that GPT-5.2 achieves the highest average score (77.6%) while identifying key gaps in antenatal testing recommendations. We discuss future validation through human participant studies and randomized controlled trials.",
+        "datePublished": "2026-07-04",
+        "inLanguage": "en",
+        "author": [
+          { "@type": "Person", "name": "Vaibhav Balloli", "affiliation": { "@type": "CollegeOrUniversity", "name": "University of Michigan" }, "url": "https://profile.vballoli.com/" },
+          { "@type": "Person", "name": "Carissa Samuel", "affiliation": { "@type": "CollegeOrUniversity", "name": "University of Michigan" } },
+          { "@type": "Person", "name": "Samia Abdelnabi", "affiliation": { "@type": "CollegeOrUniversity", "name": "University of Michigan" }, "url": "https://nursing.umich.edu/directory/samia-abdelnabi" },
+          { "@type": "Person", "name": "Alex Peahl", "affiliation": { "@type": "CollegeOrUniversity", "name": "University of Michigan" }, "url": "https://medschool.umich.edu/profile/5667/alex-f-peahl" },
+          { "@type": "Person", "name": "Elizabeth Bondi-Kelly", "affiliation": { "@type": "CollegeOrUniversity", "name": "University of Michigan" }, "url": "https://sites.google.com/view/elizabethbondi" }
+        ],
+        "publisher": { "@type": "Organization", "name": "Association for Computing Machinery" },
+        "isPartOf": {
+          "@type": "PublicationVolume",
+          "name": "Proceedings of the 2026 ACM Interactive Health Conference (IH '26)",
+          "isbn": "979-8-4007-2422-0"
+        },
+        "identifier": [
+          { "@type": "PropertyValue", "propertyID": "DOI", "value": "10.1145/3786579.3804996" }
+        ],
+        "sameAs": "https://doi.org/10.1145/3786579.3804996",
+        "url": "https://realize-lab.github.io/PATHFinder/",
+        "pagination": "1-5",
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "isAccessibleForFree": true,
+        "keywords": "prenatal care, maternal health, women's health, preventive health, LLM agent, AI agent, conversational agent, ACOG PATH guidelines, clinician in the loop, social determinants of health, Michigan 211, health equity, obstetrics, digital health",
+        "about": [
+          { "@type": "MedicalCondition", "name": "Pregnancy" },
+          { "@type": "Thing", "name": "Prenatal care" },
+          { "@type": "Thing", "name": "Maternal health" },
+          { "@type": "Thing", "name": "Large language model agents" },
+          { "@type": "Thing", "name": "Social determinants of health" }
+        ],
+        "citation": "Vaibhav Balloli, Carissa Samuel, Samia Abdelnabi, Alex Peahl, and Elizabeth Bondi-Kelly. 2026. PATHFinder Agent for Tailored Prenatal Care. In Interactive Health Conference (IH '26), July 05-08, 2026, Porto, Portugal. ACM, New York, NY, USA, 5 pages.",
+        "image": "https://realize-lab.github.io/PATHFinder/figures/pathfinder_overview.png",
+        "encoding": { "@type": "MediaObject", "encodingFormat": "application/pdf", "contentUrl": "https://realize-lab.github.io/PATHFinder/PATHFinder_ACM_IH.pdf" },
+        "funder": [
+          { "@type": "Organization", "name": "Google" },
+          { "@type": "CollegeOrUniversity", "name": "University of Michigan" }
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://realize-lab.github.io/PATHFinder/#website",
+        "url": "https://realize-lab.github.io/PATHFinder/",
+        "name": "PATHFinder Agent for Tailored Prenatal Care",
+        "description": "Project page and interactive demo for PATHFinder Agent, an LLM-based agentic system for tailored prenatal care planning.",
+        "inLanguage": "en",
+        "publisher": {
+          "@type": "ResearchOrganization",
+          "name": "REALIZE Lab, University of Michigan",
+          "url": "https://sites.google.com/view/elizabethbondi",
+          "parentOrganization": { "@type": "CollegeOrUniversity", "name": "University of Michigan", "url": "https://umich.edu/" }
+        },
+        "mainEntity": { "@id": "https://realize-lab.github.io/PATHFinder/#article" }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://realize-lab.github.io/PATHFinder/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is PATHFinder Agent?",
+            "acceptedAnswer": { "@type": "Answer", "text": "PATHFinder Agent (Planner for Appropriate Tailored Healthcare) is an end-to-end conversational AI agent, built on large language models, that produces individualized prenatal care plans. It collects a patient's medical history and social context through structured dialogue, applies the ACOG PATH tailored prenatal care guidelines, matches identified social needs to Michigan 211 community resources, and routes every plan through a clinician for review before it is used in care." }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the ACOG PATH guidelines for tailored prenatal care?",
+            "acceptedAnswer": { "@type": "Answer", "text": "PATH stands for Plan for Appropriate Tailored Healthcare in Pregnancy. Developed by an expert panel convened by the American College of Obstetricians and Gynecologists and the University of Michigan, PATH replaces the century-old fixed 12 to 14 visit schedule with a plan built around each patient's medical needs, social and structural risk factors, and preferences. It recommends a core set of in-person visits plus flexible use of telehealth and group care. PATHFinder Agent operationalizes these guidelines in software." }
+          },
+          {
+            "@type": "Question",
+            "name": "How does PATHFinder keep clinicians in the loop?",
+            "acceptedAnswer": { "@type": "Answer", "text": "PATHFinder never delivers a plan directly to a patient without oversight. Its fourth workflow stage is a clinician review dashboard showing the patient summary, the clinical summary, the proposed visit timeline, risk flags, and escalation controls. The clinician can approve or edit any recommendation, and a separate oversight classifier plus a tool that defers to the clinician guard against unintended agent behavior." }
+          },
+          {
+            "@type": "Question",
+            "name": "How does PATHFinder address social determinants of health?",
+            "acceptedAnswer": { "@type": "Answer", "text": "The intake and dialogue stages capture unmet social needs such as housing instability, limited transportation, food insecurity, inflexible work schedules, and language access. The agent queries a hierarchical Michigan 211 resource index by category, subcategory, and ZIP code through dedicated tool calls, producing a resource assistance plan alongside the medical plan rather than treating social needs as an afterthought." }
+          },
+          {
+            "@type": "Question",
+            "name": "Which large language models were evaluated, and how well did they do?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Frontier models were scored against expert-curated rubrics on five clinical dimensions: visit frequency, services, antenatal testing, delivery timing, and modality of care. GPT-5.2 scored highest at 77.6 percent, followed by Gemini 2.5 Pro at 71.5 percent, Gemini 2.5 Flash at 62.0 percent, and GPT-4o at 57.25 percent. Visit frequency was the easiest dimension for every model; antenatal testing and service recommendations showed the widest performance gaps, which is why human and automated oversight remain necessary." }
+          },
+          {
+            "@type": "Question",
+            "name": "Is PATHFinder safe to deploy in a clinic today?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Not yet as an autonomous system. The published evaluation uses synthetic patient profiles and LLM-as-judge rubric scoring, and the results show meaningful gaps in antenatal testing recommendations. We are actively working on extensive evaluation and human-AI studies, and the design assumes clinician review of every plan. For more, contact vballoli@umich.edu." }
+          }
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://realize-lab.github.io/PATHFinder/#demo",
+        "name": "PATHFinder interactive demo",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web browser",
+        "url": "https://realize-lab.github.io/PATHFinder/#demo",
+        "description": "A step-through walkthrough of the four-stage PATHFinder workflow: patient intake, dynamic follow-up dialogue, draft care plan and report review, and joint clinician-patient review.",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    ]
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,7 +207,7 @@
     <header class="top-bar">
       <!-- Left: Logo + brand + description -->
       <div class="tb-left">
-        <img class="tb-logo" src="logo.png" alt="PATHFinder logo" />
+        <img class="tb-logo" src="logo.png" alt="" width="595" height="595" />
         <div class="tb-brand">
           <span class="tb-title">PATHFinder</span>
           <span class="tb-desc">Planner for Appropriate Tailored Healthcare</span>
@@ -42,12 +215,12 @@
       </div>
       <!-- Center: Overview / Demo tabs -->
       <nav class="tb-center" aria-label="Main navigation">
-        <button class="page-tab-btn active" data-page-target="overviewPage" type="button" aria-current="page">Overview</button>
-        <button class="page-tab-btn" data-page-target="demoPage" type="button">Demo</button>
+        <button class="page-tab-btn active" data-page-target="overviewPage" type="button" aria-current="page" aria-controls="overviewPage">Overview</button>
+        <button class="page-tab-btn" data-page-target="demoPage" type="button" aria-controls="demoPage">Demo</button>
       </nav>
       <!-- Right: Michigan logo + theme toggle -->
       <div class="tb-right">
-        <img class="tb-michigan" src="michigan_logo.png" alt="University of Michigan" />
+        <img class="tb-michigan" src="michigan_logo.png" alt="University of Michigan" width="632" height="671" />
         <button id="themeToggleBtn" class="theme-toggle" type="button" aria-label="Switch color theme">
           <span id="themeToggleIcon" class="theme-toggle-icon" aria-hidden="true"></span>
           <span id="themeToggleLabel">Light</span>
@@ -63,32 +236,47 @@
         <!-- Hero -->
         <section class="hero" aria-labelledby="heroTitle">
           <div class="hero-text">
-            <p class="hero-eyebrow">ACM Interactive Health 2026 · University of Michigan · REALIZE Lab</p>
+            <p class="hero-eyebrow">Published at ACM Interactive Health 2026 (IH&nbsp;'26) · Porto, Portugal · REALIZE Lab, University of Michigan</p>
             <h1 id="heroTitle" class="hero-title">PATHFinder</h1>
-            <p class="hero-subtitle">Agents for Tailored Prenatal Care</p>
-            <p class="hero-tagline">An LLM-based agentic system that helps deliver prenatal care in a safe, scalable, and aligned manner — gathering each patient's medical and social context, mapping local resources, and individualizing visit cadence, all under clinician oversight.</p>
+            <p class="hero-subtitle">An LLM Agent for Tailored Prenatal Care</p>
+            <p class="hero-tagline">PATHFinder Agent turns the ACOG <strong>PATH</strong> tailored prenatal care guidelines into an individualized plan for every pregnancy — gathering medical history and social context through conversation, matching unmet needs to Michigan&nbsp;211 community resources, and right-sizing visit frequency, testing, and telehealth, all under clinician oversight.</p>
             <div class="hero-actions">
               <a class="btn btn-primary" href="PATHFinder_ACM_IH.pdf" target="_blank" rel="noopener">Read the Paper (PDF)</a>
               <button class="btn btn-secondary" type="button" data-goto-demo>Try the Demo</button>
-              <a class="btn btn-outline" href="#citation">BibTeX</a>
+              <a class="btn btn-outline" href="https://doi.org/10.1145/3786579.3804996" target="_blank" rel="noopener">ACM Digital Library</a>
+              <a class="btn btn-outline" href="#citation">Cite this work</a>
             </div>
           </div>
           <div class="hero-anim">
-            <div id="lottieHero" class="lottie-hero" role="img" aria-label="PATHFinder animated illustration"></div>
+            <div id="lottieHero" class="lottie-hero" role="img" aria-label="Animated illustration of the PATHFinder prenatal care agent"></div>
           </div>
+        </section>
+
+        <!-- Abstract -->
+        <section class="card landing-section" id="abstract" aria-labelledby="abstractTitle">
+          <h2 id="abstractTitle">Abstract</h2>
+          <p>Prenatal care is an important preventive service designed to improve outcomes for pregnant individuals. The American College of Obstetricians and Gynecologists (ACOG) recently introduced guidelines advocating tailored prenatal care, called <strong>PATH</strong> (Plan for Tailored Healthcare). We present <strong>PATHFinder Agent</strong> (Planner for Appropriate Tailored Healthcare), an end-to-end conversational agentic system that gathers patient health and social context through structured dialogue, curates individualized prenatal care plans aligned with PATH guidelines, and surfaces community resources from Michigan 211. The system features a four-stage workflow spanning patient intake, dynamic interaction, plan synthesis, and clinician oversight. We evaluate frontier large language models (LLMs) on expert-curated rubrics across five clinical dimensions, finding that GPT-5.2 achieves the highest average score (77.6%) while identifying key gaps in antenatal testing recommendations. We discuss future validation through human participant studies and randomized controlled trials.</p>
+          <dl class="meta-list">
+            <div class="meta-row"><dt>Venue</dt><dd><a href="https://dl.acm.org/doi/proceedings/10.1145/3786579" target="_blank" rel="noopener">Proceedings of the 2026 ACM Interactive Health Conference (IH&nbsp;'26)</a>, July 5–8, 2026, Porto, Portugal</dd></div>
+            <div class="meta-row"><dt>DOI</dt><dd><a href="https://doi.org/10.1145/3786579.3804996" target="_blank" rel="noopener">10.1145/3786579.3804996</a></dd></div>
+            <div class="meta-row"><dt>Keywords</dt><dd>Large Language Models · Large Language Model Agents · Health · Reproductive Health · Maternal Health · Healthcare Agents · LLM-in-the-loop</dd></div>
+            <div class="meta-row"><dt>CCS Concepts</dt><dd>Computing methodologies → Natural language processing · Human-centered computing → Natural language interfaces · Applied computing → Consumer health</dd></div>
+            <div class="meta-row"><dt>License</dt><dd><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a> — open access</dd></div>
+          </dl>
         </section>
 
         <!-- Motivation -->
         <section class="card landing-section" aria-labelledby="motivationTitle">
-          <h2 id="motivationTitle">Motivation</h2>
+          <h2 id="motivationTitle">Why prenatal care needs to be tailored</h2>
           <div class="section-split">
             <div class="section-copy">
-              <p>Prenatal care is care provided to birthing people — medical care, screening tests, answers to questions, and help finding social support and community resources during pregnancy.</p>
+              <p>Prenatal care is the preventive care provided to pregnant and birthing people — medical visits, screening and antenatal testing, answers to questions, and help finding social support and community resources during pregnancy.</p>
               <blockquote>"Prenatal care can improve the detection and management of chronic conditions and pregnancy complications, particularly for individuals with an increased risk of adverse outcomes." <cite>— ACOG</cite></blockquote>
-              <p>About 4 million pregnant people access prenatal care each year in the United States. At this scale, fixed, one-size-fits-all workflows can miss practical barriers and increase the risk of delayed follow-up. The core problem is aligning medically important milestones with real-life access constraints so that patients can consistently complete recommended care.</p>
+              <p>Nearly <strong>four million pregnant people</strong> receive prenatal care each year in the United States, and over <strong>80% of adverse pregnancy outcomes are preventable</strong> through essential prenatal care and management of unmet social needs. Yet the traditional 12–14 visit in-person schedule — largely unchanged for a century — is often inaccessible because of social drivers of health such as housing instability, limited transportation, and inflexible work schedules. Many patients end up underserved and feel unheard.</p>
+              <p>In 2025, ACOG issued <a href="https://www.acog.org/clinical/clinical-guidance/clinical-consensus/articles/2025/04/tailored-prenatal-care-delivery-for-pregnant-individuals" target="_blank" rel="noopener">Clinical Consensus No. 8 on tailored prenatal care delivery</a>, built on the <strong>PATH</strong> (Plan for Appropriate Tailored Healthcare in Pregnancy) framework developed with the University of Michigan. PATH tackles two things at once: <strong>addressing unmet social needs</strong> and <strong>incorporating alternative care modalities</strong> such as telehealth and group care. But adopting PATH is a complex task for patients and clinicians alike — extra visits for social needs create burden without addressing root causes, and increased demands on clinicians to handle unmet social needs with insufficient resources are associated with burnout.</p>
             </div>
             <figure class="fig">
-              <img src="figures/prenatal_problem.png" alt="Diagram of current prenatal care practice showing disjoint conversations between patients, guidelines, and clinicians." loading="lazy" />
+              <img src="figures/prenatal_problem.png" alt="Diagram of current prenatal care practice: a patient holds separate, disjoint conversations with a nurse, an OB/GYN or certified nurse midwife, and community partners, producing a fragmented prenatal care plan and resource assistance plan." loading="lazy" width="412" height="145" />
               <figcaption>Current practice: context, guidelines, and conversations live in disconnected places.</figcaption>
             </figure>
           </div>
@@ -96,21 +284,35 @@
 
         <!-- Proposal / Overview -->
         <section class="card landing-section" aria-labelledby="proposalTitle">
-          <h2 id="proposalTitle">The PATHFinder Approach</h2>
-          <p>In collaboration with expert clinicians, we present PATHFinder, an agentic system that provides conversational care to patients while keeping clinicians in the loop — enabling tailored prenatal care planning that all stakeholders can trust, and redirecting clinician effort toward improving care.</p>
+          <h2 id="proposalTitle">The PATHFinder approach</h2>
+          <p>PATHFinder Agent was <strong>co-designed by a board-certified obstetrician-gynecologist and a certified nurse midwife alongside two computer scientists</strong>, so the clinical and technical requirements were validated jointly. It centralizes what is today a set of disjoint conversations into one grounded, guideline-aware dialogue — while keeping clinicians in the loop, so that tailored prenatal care planning is something every stakeholder can trust and clinician effort can be redirected toward care rather than paperwork.</p>
+          <p>The agent has three core abilities: <strong>(a) follow up</strong> with questions and clarifications requiring medical and conversational knowledge, <strong>(b) perform actions via tool calls</strong> — searching for community resources, generating reports, running clinical calculators — and <strong>(c) follow instructions</strong> to produce a comprehensive, individualized plan.</p>
           <figure class="fig fig-mid">
-            <img src="figures/pathfinder_overview.png" alt="PATHFinder system overview: a tailored prenatal care agent connecting patient context, ACOG guidelines, and local resources." loading="lazy" />
-            <figcaption>PATHFinder system overview — a tailored prenatal care agent connecting patient context, clinical guidelines, and community resources.</figcaption>
+            <img src="figures/pathfinder_overview.png" alt="PATHFinder system overview: a patient converses with a prenatal care agent, which produces a comprehensive care plan and deliverables including an intake summary, a resource assistance plan, and a prenatal care plan." loading="lazy" width="2284" height="904" />
+            <figcaption>PATHFinder system overview — a centralized, scalable conversation with an agent equipped with the latest guidelines and grounded community resources.</figcaption>
           </figure>
+          <h3 class="sub-h">Under the hood</h3>
+          <ul class="feature-list">
+            <li><strong>13 tools across 4 categories.</strong> Medical (a TOLAC calculator for trial of labor after cesarean; a structured "defer to clinician" referral), social needs resources (hierarchical Michigan 211 queries by group, category, subcategory, and ZIP code), personalization (a secondary LLM that generates context-aware follow-up questions), and reporting (patient summary, clinical summary, recommendations, resources, visit schedule).</li>
+            <li><strong>Grounded in guidelines.</strong> System instructions total roughly 14,000 tokens of domain knowledge drawn from the ACOG PATH guidelines, plus tool-use instructions, workflow rules, and safety policies that the agent retrieves as it works.</li>
+            <li><strong>Real community resource data.</strong> Social needs are matched against <a href="https://mi211.org/" target="_blank" rel="noopener">Michigan 211</a> data organized by category — food, housing, transportation, utilities, clothing — and queried by subcategory and ZIP code through dedicated tool calls.</li>
+            <li><strong>Built for oversight.</strong> A React frontend talks to a FastAPI backend routing to the agent (LLM plus tool executor), an oversight classifier, an FHIR service, and a report generator. Conversation state is persisted in a relational database so clinicians can audit what was asked and why.</li>
+          </ul>
         </section>
 
         <!-- How it works -->
         <section class="card landing-section" aria-labelledby="howTitle">
-          <h2 id="howTitle">How It Works</h2>
-          <p>PATHFinder follows a four-stage workflow — the same flow you can step through in the interactive demo: <strong>intake</strong>, <strong>follow-up dialogue</strong>, a <strong>draft plan &amp; report</strong>, and <strong>clinician review</strong>.</p>
+          <h2 id="howTitle">How it works: the four-stage workflow</h2>
+          <p>PATHFinder follows a four-stage workflow — the same flow you can step through in the interactive demo.</p>
+          <ol class="stage-list">
+            <li><strong>Stage 1 — Patient intake.</strong> The patient completes a standardized form that mirrors existing clinical intake processes: demographics, medical history, gestational age from last menstrual period, and social factors. Where available, EHR data is imported rather than re-asked.</li>
+            <li><strong>Stage 2 — Dynamic interaction.</strong> Conditioned on those responses and on the guidelines, the agent asks personalized, non-redundant follow-up questions to elicit unmet social needs, preferences, and barriers. A second LLM reviews the questions and generates a form-based interface with buttons, check boxes, and sliders — reducing how much the patient has to type and preventing fatigue in long sessions.</li>
+            <li><strong>Stage 3 — Plan synthesis and patient review.</strong> The agent invokes its report tools to compose a patient-facing summary, a clinical summary, a visit schedule, and curated Michigan 211 resources. The patient reads the draft and can ask clarifying questions — "What does GTT mean?" — and get answers in place.</li>
+            <li><strong>Stage 4 — Clinician oversight.</strong> The clinician reviews the patient summary, report, and timeline on a dashboard showing conversation stage, risk flags, and escalation controls, then approves or edits before the plan is used in care.</li>
+          </ol>
           <figure class="fig fig-wide">
-            <img src="figures/workflow_ih.png" alt="PATHFinder four-stage workflow: intake, follow-up dialogue, draft plan, and clinician review." loading="lazy" />
-            <figcaption>The four-stage PATHFinder workflow.</figcaption>
+            <img src="figures/workflow_ih.png" alt="PATHFinder four-stage workflow diagram: Stage 1 user-intake form, Stage 2 agent follow-up dialogue with tool calls, Stage 3 patient draft report review and clarification, Stage 4 clinician review and edits producing a final report and timeline." loading="lazy" width="2211" height="748" />
+            <figcaption>The four-stage PATHFinder workflow, from intake to clinician-approved plan.</figcaption>
           </figure>
           <div class="cta-inline">
             <button class="btn btn-primary" type="button" data-goto-demo>Walk through the interactive demo →</button>
@@ -119,26 +321,98 @@
 
         <!-- Results -->
         <section class="card landing-section" aria-labelledby="resultsTitle">
-          <h2 id="resultsTitle">Evaluation</h2>
-          <p>We evaluate PATHFinder against a clinician-informed rubric spanning multiple dimensions of plan quality, safety, and alignment.</p>
+          <h2 id="resultsTitle">Evaluation: how well do frontier LLMs plan prenatal care?</h2>
+          <p>We evaluate PATHFinder Agent on synthetic patient profiles spanning diverse medical histories — including high-risk pregnancies and TOLAC candidates. Each profile is paired with an expert-curated rubric specifying the correct expectations along five clinical dimensions: <strong>visit frequency</strong>, <strong>services</strong> (testing and recommendations), <strong>antenatal testing</strong> (for example, timing of growth ultrasound), <strong>delivery timing</strong>, and <strong>modality of care</strong> (mandatory in-person, mixed in-person, group health). We use LLM-as-judge scoring, with each final score normalized to 1.</p>
+          <div class="table-scroll">
+            <table class="data-table">
+              <caption>Average rubric-based scores (0–100%) across frontier models. Higher is better.</caption>
+              <thead>
+                <tr><th scope="col">Model</th><th scope="col">Avg. rubric score</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">GPT-5.2</th><td>77.60%</td></tr>
+                <tr><th scope="row">Gemini 2.5 Pro</th><td>71.50%</td></tr>
+                <tr><th scope="row">Gemini 2.5 Flash</th><td>62.00%</td></tr>
+                <tr><th scope="row">GPT-4o</th><td>57.25%</td></tr>
+              </tbody>
+            </table>
+          </div>
           <figure class="fig fig-wide">
-            <img src="figures/dimension_heatmap.png" alt="Heatmap of per-dimension rubric scores across different models." loading="lazy" />
-            <figcaption>Per-dimension rubric scores across models.</figcaption>
+            <img src="figures/dimension_heatmap.png" alt="Heatmap of per-dimension rubric scores across GPT-5.2, Gemini 2.5 Pro, Gemini 2.5 Flash, and GPT-4o, for the antenatal testing, delivery timing, growth ultrasound, modality, services, and visit frequency dimensions." loading="lazy" width="481" height="332" />
+            <figcaption>Per-dimension rubric scores across models. Antenatal testing and service recommendations show the widest performance gap; visit frequency is the easiest dimension for every model.</figcaption>
           </figure>
+          <p><strong>What this means for deployment.</strong> Even the strongest model leaves roughly a fifth of the rubric unmet, and the gaps cluster in exactly the recommendations that matter clinically — antenatal testing and services. These results argue that robust oversight measures, both LLM-driven and human, must be built into agentic health systems with appropriate communication so that deployed models do not make mistakes. That is why clinician review is a stage of the workflow rather than an optional add-on.</p>
+        </section>
+
+        <!-- FAQ -->
+        <section class="card landing-section" id="faq" aria-labelledby="faqTitle">
+          <h2 id="faqTitle">Frequently asked questions</h2>
+
+          <details class="faq-item">
+            <summary>What is PATHFinder Agent?</summary>
+            <p>PATHFinder Agent (Planner for Appropriate Tailored Healthcare) is an end-to-end conversational AI agent, built on large language models, that produces individualized prenatal care plans. It collects a patient's medical history and social context through structured dialogue, applies the ACOG PATH tailored prenatal care guidelines, matches identified social needs to Michigan 211 community resources, and routes every plan through a clinician for review before it is used in care.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>What are the ACOG PATH guidelines for tailored prenatal care?</summary>
+            <p>PATH stands for <em>Plan for Appropriate Tailored Healthcare in Pregnancy</em>. Developed by an independent expert panel convened by the American College of Obstetricians and Gynecologists and the University of Michigan, PATH replaces the century-old fixed 12–14 visit schedule with a plan built around each patient's medical needs, social and structural risk factors, and preferences. It recommends a core set of in-person visits plus flexible use of telehealth and group care. PATHFinder Agent operationalizes these guidelines in software.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>How does PATHFinder keep clinicians in the loop?</summary>
+            <p>PATHFinder never delivers a plan to a patient without oversight. Its fourth workflow stage is a clinician review dashboard showing the patient summary, the clinical summary, the proposed visit timeline, risk flags, and escalation controls. The clinician can approve or edit any recommendation. A separate oversight classifier and a dedicated "defer to clinician" tool guard against unintended agent behavior, and full conversation state is persisted so decisions can be audited.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>How does PATHFinder address social determinants of health?</summary>
+            <p>The intake and dialogue stages capture unmet social needs — housing instability, limited transportation, food insecurity, inflexible work schedules, language access, and support systems. The agent then queries a hierarchical Michigan 211 resource index by category, subcategory, and ZIP code through dedicated tool calls, producing a resource assistance plan alongside the medical plan. Social needs are treated as first-class inputs to the care plan rather than an afterthought.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>Which large language models were evaluated, and how well did they do?</summary>
+            <p>Frontier models were scored against expert-curated rubrics on five clinical dimensions. GPT-5.2 scored highest at 77.60%, followed by Gemini 2.5 Pro at 71.50%, Gemini 2.5 Flash at 62.00%, and GPT-4o at 57.25%. Visit frequency was the easiest dimension for every model; antenatal testing and service recommendations showed the widest performance gaps — which is precisely why human and automated oversight remain necessary.</p>
+          </details>
+
+          <details class="faq-item">
+            <summary>Is PATHFinder safe to deploy in a clinic today?</summary>
+            <p>Not yet as an autonomous system. The published evaluation uses synthetic patient profiles and LLM-as-judge rubric scoring, and the results show meaningful gaps in antenatal testing recommendations. We are actively working on extensive evaluation and human-AI studies, and the design assumes clinician review of every plan. For more, contact <a href="mailto:vballoli@umich.edu">vballoli@umich.edu</a>.</p>
+          </details>
         </section>
 
         <!-- Citation -->
         <section class="card landing-section" id="citation" aria-labelledby="citationTitle">
           <div class="citation-head">
-            <h2 id="citationTitle">Citation</h2>
+            <h2 id="citationTitle">Cite this paper</h2>
             <button id="copyBibtexBtn" class="btn btn-outline btn-sm" type="button">Copy BibTeX</button>
           </div>
+
+          <h3 class="sub-h">ACM Reference Format</h3>
+          <p class="acm-ref">Vaibhav Balloli, Carissa Samuel, Samia Abdelnabi, Alex Peahl, and Elizabeth Bondi-Kelly. 2026. PATHFinder Agent for Tailored Prenatal Care. In <em>Interactive Health Conference (IH '26), July 05–08, 2026, Porto, Portugal</em>. Association for Computing Machinery, New York, NY, USA, Article 75, 5 pages. <a href="https://doi.org/10.1145/3786579.3804996" target="_blank" rel="noopener">https://doi.org/10.1145/3786579.3804996</a></p>
+
+          <h3 class="sub-h">BibTeX</h3>
           <pre class="citation-block" id="bibtexBlock">@inproceedings{balloli2026pathfinder,
-  title={PATHFinder Agents for Tailored Prenatal Care},
-  author={Balloli, Vaibhav and Samuel, Carissa and Abdelnabi, Samia and Peahl, Alex and Bondi-Kelly, Elizabeth},
-  booktitle={ACM Interactive Health},
-  year={2026}
+  author    = {Balloli, Vaibhav and Samuel, Carissa and Abdelnabi, Samia and Peahl, Alex and Bondi-Kelly, Elizabeth},
+  title     = {PATHFinder Agent for Tailored Prenatal Care},
+  year      = {2026},
+  isbn      = {979-8-4007-2422-0},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  url       = {https://doi.org/10.1145/3786579.3804996},
+  doi       = {10.1145/3786579.3804996},
+  booktitle = {Proceedings of the 2026 ACM Interactive Health Conference},
+  articleno = {75},
+  numpages  = {5},
+  keywords  = {Large Language Models, Large Language Model Agents, Health,
+               Reproductive Health, Maternal Health, Healthcare Agents,
+               LLM-in-the-loop},
+  location  = {Porto, Portugal},
+  series    = {IH '26}
 }</pre>
+          <ul class="link-row">
+            <li><a href="https://doi.org/10.1145/3786579.3804996" target="_blank" rel="noopener">ACM Digital Library (open access)</a></li>
+            <li><a href="PATHFinder_ACM_IH.pdf" target="_blank" rel="noopener">Download PDF</a></li>
+            <li><a href="https://dl.acm.org/doi/proceedings/10.1145/3786579" target="_blank" rel="noopener">IH '26 proceedings</a></li>
+          </ul>
         </section>
 
         <!-- Team -->
@@ -147,31 +421,39 @@
           <div class="team-grid">
             <figure class="team-member">
               <a href="https://profile.vballoli.com/" target="_blank" rel="noopener" class="team-link">
-                <img class="team-photo" src="vaibhav_balloli.jpeg" alt="Vaibhav Balloli" loading="lazy" />
-                <figcaption><span class="team-name">Vaibhav Balloli</span><span class="team-role">PhD Candidate, CSE</span></figcaption>
+                <img class="team-photo" src="vaibhav_balloli.jpeg" alt="Portrait of Vaibhav Balloli" loading="lazy" width="200" height="200" />
+                <figcaption><span class="team-name">Vaibhav Balloli</span><span class="team-role">PhD Candidate, Computer Science &amp; Engineering</span></figcaption>
               </a>
             </figure>
             <figure class="team-member">
               <a href="https://nursing.umich.edu/directory/samia-abdelnabi" target="_blank" rel="noopener" class="team-link">
-                <img class="team-photo" src="samia_abdenlabi.jpeg" alt="Dr. Samia Abdelnabi" loading="lazy" />
-                <figcaption><span class="team-name">Dr. Samia Abdelnabi</span><span class="team-role">Clinical Asst. Professor, Health Behavior</span></figcaption>
+                <img class="team-photo" src="samia_abdenlabi.jpeg" alt="Portrait of Dr. Samia Abdelnabi" loading="lazy" width="201" height="251" />
+                <figcaption><span class="team-name">Dr. Samia Abdelnabi</span><span class="team-role">Certified Nurse Midwife · Clinical Asst. Professor, Health Behavior</span></figcaption>
               </a>
             </figure>
             <figure class="team-member">
               <a href="https://medschool.umich.edu/profile/5667/alex-f-peahl" target="_blank" rel="noopener" class="team-link">
-                <img class="team-photo" src="alex_peahl.jpeg" alt="Dr. Alex Peahl" loading="lazy" />
-                <figcaption><span class="team-name">Dr. Alex Peahl</span><span class="team-role">Asst. Professor, OB/GYN (ACOG guidelines author)</span></figcaption>
+                <img class="team-photo" src="alex_peahl.jpeg" alt="Portrait of Dr. Alex Peahl" loading="lazy" width="204" height="192" />
+                <figcaption><span class="team-name">Dr. Alex Peahl</span><span class="team-role">Asst. Professor, Obstetrics &amp; Gynecology · author of the ACOG PATH guidelines</span></figcaption>
               </a>
             </figure>
             <figure class="team-member">
               <a href="https://sites.google.com/view/elizabethbondi" target="_blank" rel="noopener" class="team-link">
-                <img class="team-photo" src="liz_bondi_kelly.jpeg" alt="Dr. Liz Bondi-Kelly" loading="lazy" />
-                <figcaption><span class="team-name">Dr. Liz Bondi-Kelly</span><span class="team-role">Asst. Professor, CSE</span></figcaption>
+                <img class="team-photo" src="liz_bondi_kelly.jpeg" alt="Portrait of Dr. Elizabeth Bondi-Kelly" loading="lazy" width="225" height="225" />
+                <figcaption><span class="team-name">Dr. Elizabeth Bondi-Kelly</span><span class="team-role">Asst. Professor, Computer Science &amp; Engineering · REALIZE Lab</span></figcaption>
               </a>
             </figure>
           </div>
-          <p class="team-note">Authors: Vaibhav Balloli, Carissa Samuel, Samia Abdelnabi, Alex Peahl, and Elizabeth Bondi-Kelly · University of Michigan, REALIZE Lab.</p>
+          <p class="team-note">Authors: Vaibhav Balloli, Carissa Samuel, Samia Abdelnabi, Alex Peahl, and Elizabeth Bondi-Kelly · REALIZE Lab, University of Michigan, Ann Arbor, USA.</p>
+          <p class="team-note">Contact: <a href="mailto:vballoli@umich.edu">vballoli@umich.edu</a> · <a href="mailto:ecbk@umich.edu">ecbk@umich.edu</a></p>
+          <p class="team-note">Acknowledgements: This work was partially supported by funding from Google and the University of Michigan, including the Raoul Wallenberg Institute, E-Health and Artificial Intelligence, and the Center for Academic Innovation.</p>
         </section>
+
+        <footer class="card landing-section site-footer">
+          <p><strong>PATHFinder Agent for Tailored Prenatal Care</strong> — Vaibhav Balloli, Carissa Samuel, Samia Abdelnabi, Alex Peahl, and Elizabeth Bondi-Kelly. Proceedings of the 2026 ACM Interactive Health Conference (IH '26), Porto, Portugal. <a href="https://doi.org/10.1145/3786579.3804996" target="_blank" rel="noopener">doi:10.1145/3786579.3804996</a></p>
+          <p>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. © 2026 the authors. <a href="https://github.com/realize-lab/PATHFinder" target="_blank" rel="noopener">Project repository</a>.</p>
+          <p class="footer-note">This site describes a research prototype. It is not a medical device and does not provide medical advice. Talk to a qualified healthcare professional about your pregnancy care.</p>
+        </footer>
 
       </div>
     </section>
@@ -191,13 +473,13 @@
       <section class="controls-row" aria-label="Demo navigation">
         <div class="cr-steps">
           <div class="step-dots" role="tablist" aria-label="Demo steps">
-            <button class="step-dot active" data-step="0" aria-current="step" aria-label="Step 1: Intake Form">1</button>
-            <div class="step-connector"></div>
-            <button class="step-dot" data-step="1" aria-label="Step 2: PATHFinder Questions">2</button>
-            <div class="step-connector"></div>
-            <button class="step-dot" data-step="2" aria-label="Step 3: Draft Report Review">3</button>
-            <div class="step-connector"></div>
-            <button class="step-dot" data-step="3" aria-label="Step 4: Joint Review">4</button>
+            <button type="button" role="tab" class="step-dot active" data-step="0" aria-selected="true" aria-controls="phase-intake" aria-label="Step 1: Intake Form">1</button>
+            <div class="step-connector" aria-hidden="true"></div>
+            <button type="button" role="tab" class="step-dot" data-step="1" aria-selected="false" aria-controls="phase-questions" aria-label="Step 2: PATHFinder Questions">2</button>
+            <div class="step-connector" aria-hidden="true"></div>
+            <button type="button" role="tab" class="step-dot" data-step="2" aria-selected="false" aria-controls="phase-report" aria-label="Step 3: Draft Report Review">3</button>
+            <div class="step-connector" aria-hidden="true"></div>
+            <button type="button" role="tab" class="step-dot" data-step="3" aria-selected="false" aria-controls="phase-joint" aria-label="Step 4: Joint Review">4</button>
           </div>
           <span id="phaseLabel" class="phase-label">Step 1 of 4: Intake Form</span>
         </div>
@@ -229,25 +511,25 @@
 
       <!-- ===== Phase 1: Intake Form ===== -->
       <section id="phase-intake" class="phase-panel active phase-content" aria-label="Step 1: Intake">
-        <div class="intake-tabs-row">
-          <button class="intake-tab" data-itab="ehr">EHR Data</button>
-          <button class="intake-tab active-itab" data-itab="personal">2&nbsp; Personal Information</button>
-          <button class="intake-tab" data-itab="health">3&nbsp; Health History</button>
-          <button class="intake-tab" data-itab="allergies">4&nbsp; Allergies</button>
-          <button class="intake-tab" data-itab="social">5&nbsp; Social &amp; Environmental</button>
+        <div class="intake-tabs-row" role="tablist" aria-label="Intake sections">
+          <button type="button" role="tab" class="intake-tab" data-itab="ehr" aria-selected="false" aria-controls="itab-ehr">EHR Data</button>
+          <button type="button" role="tab" class="intake-tab active-itab" data-itab="personal" aria-selected="true" aria-controls="itab-personal">2&nbsp; Personal Information</button>
+          <button type="button" role="tab" class="intake-tab" data-itab="health" aria-selected="false" aria-controls="itab-health">3&nbsp; Health History</button>
+          <button type="button" role="tab" class="intake-tab" data-itab="allergies" aria-selected="false" aria-controls="itab-allergies">4&nbsp; Allergies</button>
+          <button type="button" role="tab" class="intake-tab" data-itab="social" aria-selected="false" aria-controls="itab-social">5&nbsp; Social &amp; Environmental</button>
         </div>
-        <div class="intake-progress"><div class="intake-progress-fill" id="intakeProgressFill"></div></div>
+        <div class="intake-progress" role="progressbar" aria-label="Intake completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="intakeProgress"><div class="intake-progress-fill" id="intakeProgressFill"></div></div>
 
         <div class="intake-scroll">
           <div class="intake-content" id="itab-personal">
             <div class="intake-card">
               <h3>Personal Information</h3>
               <div class="form-grid">
-                <label>First Name <input type="text" value="V" disabled /></label>
-                <label>Last Name <input type="text" value="B" disabled /></label>
-                <label>Date of Birth <input type="text" value="01/01/1999" disabled /></label>
-                <label>Gender <input type="text" value="Female" disabled /></label>
-                <label>Pronouns <input type="text" value="She/Her" disabled /></label>
+                <label>First Name <input type="text" value="V" readonly /></label>
+                <label>Last Name <input type="text" value="B" readonly /></label>
+                <label>Date of Birth <input type="text" value="01/01/1999" readonly /></label>
+                <label>Gender <input type="text" value="Female" readonly /></label>
+                <label>Pronouns <input type="text" value="She/Her" readonly /></label>
               </div>
             </div>
           </div>
@@ -256,9 +538,9 @@
               <h3>Health History</h3>
               <div class="form-grid-single">
                 <label>Last Menstrual Period (LMP) <input type="date" id="lmpInput" value="2025-12-04" /></label>
-                <label>Previous health conditions <input type="text" value="None" disabled /></label>
-                <label>Surgeries or hospitalizations <input type="text" value="None" disabled /></label>
-                <label>Current health problems or symptoms <input type="text" value="High blood pressure" disabled /></label>
+                <label>Previous health conditions <input type="text" value="None" readonly /></label>
+                <label>Surgeries or hospitalizations <input type="text" value="None" readonly /></label>
+                <label>Current health problems or symptoms <input type="text" value="High blood pressure" readonly /></label>
               </div>
             </div>
           </div>
@@ -266,8 +548,8 @@
             <div class="intake-card">
               <h3>Allergies</h3>
               <div class="form-grid-single">
-                <label>Known Allergies <input type="text" value="None reported" disabled /></label>
-                <label>Drug Allergies <input type="text" value="None reported" disabled /></label>
+                <label>Known Allergies <input type="text" value="None reported" readonly /></label>
+                <label>Drug Allergies <input type="text" value="None reported" readonly /></label>
               </div>
             </div>
           </div>
@@ -275,12 +557,12 @@
             <div class="intake-card">
               <h3>Social &amp; Environmental Factors</h3>
               <div class="form-grid">
-                <label>Housing Status <input type="text" value="Stable housing" disabled /></label>
-                <label>Transportation <input type="text" value="Limited - public transit" disabled /></label>
-                <label>Employment <input type="text" value="Part-time employed" disabled /></label>
-                <label>Food Security <input type="text" value="Occasionally insecure" disabled /></label>
-                <label>Support System <input type="text" value="Lives with partner" disabled /></label>
-                <label>Primary Language <input type="text" value="English" disabled /></label>
+                <label>Housing Status <input type="text" value="Stable housing" readonly /></label>
+                <label>Transportation <input type="text" value="Limited - public transit" readonly /></label>
+                <label>Employment <input type="text" value="Part-time employed" readonly /></label>
+                <label>Food Security <input type="text" value="Occasionally insecure" readonly /></label>
+                <label>Support System <input type="text" value="Lives with partner" readonly /></label>
+                <label>Primary Language <input type="text" value="English" readonly /></label>
               </div>
             </div>
           </div>
@@ -288,10 +570,10 @@
             <div class="intake-card">
               <h3>EHR Data Import</h3>
               <div class="form-grid">
-                <label>MRN <input type="text" value="MRN-20260001" disabled /></label>
-                <label>Insurance <input type="text" value="Medicaid" disabled /></label>
-                <label>Primary Provider <input type="text" value="Dr. Smith, OB/GYN" disabled /></label>
-                <label>Gravida/Para <input type="text" value="G1P0" disabled /></label>
+                <label>MRN <input type="text" value="MRN-20260001" readonly /></label>
+                <label>Insurance <input type="text" value="Medicaid" readonly /></label>
+                <label>Primary Provider <input type="text" value="Dr. Smith, OB/GYN" readonly /></label>
+                <label>Gravida/Para <input type="text" value="G1P0" readonly /></label>
               </div>
             </div>
           </div>

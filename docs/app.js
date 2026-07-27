@@ -335,6 +335,7 @@ function updateStepBar() {
     if (i < state.currentPhase) dot.classList.add("completed");
     else if (i === state.currentPhase) { dot.classList.add("active"); dot.setAttribute("aria-current", "step"); }
     if (i !== state.currentPhase) dot.removeAttribute("aria-current");
+    dot.setAttribute("aria-selected", i === state.currentPhase ? "true" : "false");
   });
   $$(".step-connector").forEach((conn, i) => {
     conn.classList.toggle("done", i < state.currentPhase);
@@ -363,15 +364,24 @@ function showPhase(idx) {
 
 // ── Phase 1: Intake ──
 function renderIntakeTab(tab) {
-  $$(".intake-tab").forEach((t) => t.classList.remove("active-itab"));
+  $$(".intake-tab").forEach((t) => {
+    t.classList.remove("active-itab");
+    t.setAttribute("aria-selected", "false");
+  });
   $$(".intake-content").forEach((c) => c.classList.add("hidden"));
   const tabBtn = $$(".intake-tab").find((t) => t.dataset.itab === tab);
-  if (tabBtn) tabBtn.classList.add("active-itab");
+  if (tabBtn) { tabBtn.classList.add("active-itab"); tabBtn.setAttribute("aria-selected", "true"); }
   const content = $("itab-" + tab);
   if (content) content.classList.remove("hidden");
   const tabs = ["ehr", "personal", "health", "allergies", "social"];
   const idx = tabs.indexOf(tab);
-  $("intakeProgressFill").style.width = ((idx + 1) / tabs.length * 100) + "%";
+  const pct = Math.round((idx + 1) / tabs.length * 100);
+  $("intakeProgressFill").style.width = pct + "%";
+  const bar = $("intakeProgress");
+  if (bar) {
+    bar.setAttribute("aria-valuenow", String(pct));
+    bar.setAttribute("aria-valuetext", `Section ${idx + 1} of ${tabs.length}`);
+  }
 }
 
 // ── Phase 2: Questions ──
@@ -775,6 +785,15 @@ function initLightbox() {
 
   let images = [];
   let current = 0;
+  let lastFocused = null;
+
+  // Figures open in the lightbox on click, so expose them to keyboard and
+  // screen-reader users as real buttons rather than plain images.
+  document.querySelectorAll("#overviewPage .fig img").forEach((img) => {
+    img.setAttribute("role", "button");
+    img.setAttribute("tabindex", "0");
+    img.setAttribute("aria-label", `Enlarge figure: ${img.alt}`);
+  });
 
   function collectImages() {
     images = Array.from(document.querySelectorAll("#overviewPage .fig img")).map((img) => ({
@@ -793,6 +812,7 @@ function initLightbox() {
     lbImg.alt = item.alt;
     lbCaption.textContent = item.caption;
     lbCounter.textContent = `${current + 1} / ${images.length}`;
+    if (lb.hidden) lastFocused = document.activeElement;
     lb.hidden = false;
     document.body.style.overflow = "hidden";
     lbClose.focus();
@@ -801,19 +821,32 @@ function initLightbox() {
   function close() {
     lb.hidden = true;
     document.body.style.overflow = "";
+    // Return focus to the figure the viewer came from.
+    if (lastFocused && document.contains(lastFocused)) lastFocused.focus();
+    lastFocused = null;
   }
 
   function navigate(dir) {
     openAt(current + dir);
   }
 
+  function openFromImage(img) {
+    collectImages();
+    const idx = images.findIndex((it) => it.src === img.src);
+    openAt(idx >= 0 ? idx : 0);
+  }
+
   document.addEventListener("click", (e) => {
     const img = e.target.closest("#overviewPage .fig img");
-    if (img) {
-      collectImages();
-      const idx = images.findIndex((it) => it.src === img.src);
-      openAt(idx >= 0 ? idx : 0);
-    }
+    if (img) openFromImage(img);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const img = e.target.closest?.("#overviewPage .fig img");
+    if (!img) return;
+    e.preventDefault();
+    openFromImage(img);
   });
 
   lbClose.addEventListener("click", close);
@@ -830,6 +863,16 @@ function initLightbox() {
     if (e.key === "Escape") close();
     if (e.key === "ArrowLeft") navigate(-1);
     if (e.key === "ArrowRight") navigate(1);
+    // Keep Tab inside the dialog while it is open.
+    if (e.key === "Tab") {
+      const stops = [lbPrev, lbNext, lbClose].filter((el) => el && el.offsetParent !== null);
+      if (!stops.length) return;
+      const first = stops[0];
+      const last = stops[stops.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      else if (!stops.includes(document.activeElement)) { e.preventDefault(); first.focus(); }
+    }
   });
 
   lb.addEventListener("wheel", (e) => {

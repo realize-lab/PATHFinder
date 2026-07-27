@@ -1,15 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://realize-lab.github.io/PATHFinder/</loc>
-    <lastmod>2026-06-25</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://realize-lab.github.io/PATHFinder/figures/pathfinder_overview.png</image:loc>
+      <image:title>PATHFinder system overview</image:title>
+      <image:caption>A prenatal care agent connecting patient context, ACOG PATH guidelines, and Michigan 211 community resources.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://realize-lab.github.io/PATHFinder/figures/workflow_ih.png</image:loc>
+      <image:title>The four-stage PATHFinder workflow</image:title>
+      <image:caption>Patient intake, dynamic follow-up dialogue, draft plan and report review, and clinician oversight.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://realize-lab.github.io/PATHFinder/figures/prenatal_problem.png</image:loc>
+      <image:title>Current prenatal care practice</image:title>
+      <image:caption>Disjoint conversations between patients, clinicians, and community partners.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://realize-lab.github.io/PATHFinder/figures/dimension_heatmap.png</image:loc>
+      <image:title>Per-dimension rubric scores across frontier language models</image:title>
+      <image:caption>Antenatal testing and service recommendations show the widest performance gap across models.</image:caption>
+    </image:image>
   </url>
   <url>
     <loc>https://realize-lab.github.io/PATHFinder/PATHFinder_ACM_IH.pdf</loc>
-    <lastmod>2026-06-25</lastmod>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
 </urlset>
